@@ -61,6 +61,7 @@
   --placeholder-b: #1f2757;
   --toolbar-bg: rgba(8, 12, 32, 0.78);
   --overlay-bg: rgba(4, 6, 16, 0.94);
+  --leaf-1: #2f5e34; --leaf-2: #4f8a46; --trunk: #6b4a2b;
 
   /* Geometry */
   --radius-card: 14px;
@@ -257,7 +258,7 @@ html, body {
 
 /* Sticky toolbar */
 .toolbar-wrap {
-  position: sticky; top: 0; z-index: 20;
+  position: sticky; top: var(--tabs-h, 0px); z-index: 20;     /* sits right under the tab bar */
   padding-block: 10px;
   background: var(--toolbar-bg);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -720,6 +721,187 @@ html, body {
   /* Flip still works, it just swaps instantly. */
 }
 
+
+/* ============================================================================
+   12. TABS, "ZIEHE DEINE KARTE", MY JOURNEY (tree, stats, journal)
+   ============================================================================ */
+
+/* ---- Tab bar ---------------------------------------------------------------- */
+.tabbar-wrap {
+  position: sticky; top: 0; z-index: 25;
+  background: var(--toolbar-bg);
+  -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%);
+  border-block: 1px solid var(--line);
+}
+.tabbar { display: flex; justify-content: center; gap: 6px; padding-block: 8px; }
+.tab {
+  flex: 1 1 0; max-width: 210px; min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 0 12px; border-radius: 999px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--text-muted); font: 500 0.92rem var(--font-ui); letter-spacing: .02em; cursor: pointer;
+  transition: background .25s, color .25s, border-color .25s;
+}
+.tab:hover { color: var(--text); background: var(--surface); }
+.tab[aria-selected="true"] { color: var(--gold-bright); background: var(--surface-strong); border-color: var(--line-strong); }
+@media (max-width: 420px) { .tab { font-size: .82rem; gap: 5px; padding: 0 6px; } .tab .icon { width: 1.05em; height: 1.05em; } }
+
+.btn:disabled { opacity: .55; cursor: default; transform: none; }
+.btn-xl { min-height: 58px; padding: 0 34px; font-size: 1.08rem; }
+.btn-sm { min-height: 38px; padding: 0 14px; font-size: .8rem; }
+.btn.is-armed { border-color: #d9534f; color: #ff9a95; }
+
+/* ---- DRAW: the face-down deck ---------------------------------------------- */
+.draw { display: grid; gap: 30px; padding-block: 26px 34px; align-items: center; }
+@media (min-width: 860px) {
+  .draw { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 64px; padding-block: 48px 56px; }
+}
+
+.draw-stage {
+  position: relative;
+  width: min(66vw, 290px);
+  aspect-ratio: var(--card-ratio);
+  margin-inline: auto;
+}
+/* soft golden halo behind the deck */
+.draw-stage::before {
+  content: ""; position: absolute; inset: -26% -36%;
+  background: radial-gradient(closest-side, rgba(243, 217, 143, .30), transparent 70%);
+  animation: breathe 5s ease-in-out infinite; pointer-events: none;
+}
+@keyframes breathe { 50% { transform: scale(1.08); opacity: .75; } }
+
+.deck {
+  position: absolute; inset: 0;
+  animation: float 6s ease-in-out infinite;
+  transition: opacity .5s ease, transform .6s var(--ease);
+}
+@keyframes float { 50% { transform: translateY(-7px); } }
+.deck.is-gone { opacity: 0; transform: scale(.92) translateY(12px); pointer-events: none; animation: none; }
+
+.deck-card {
+  position: absolute; inset: 0;
+  border-radius: var(--radius-card);
+  background: var(--deck-bg) center / cover no-repeat, linear-gradient(135deg, var(--placeholder-a), var(--placeholder-b));
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, .8), inset 0 0 0 3px rgba(0, 0, 0, .14);
+  transform: translate(calc(var(--i) * 2.5px), calc(var(--i) * 3px)) rotate(calc(var(--r) * 1deg));
+}
+
+/* shuffle: the cards swing out to the sides and back, one after another */
+.deck.is-shuffling { animation: none; }
+.deck.is-shuffling .deck-card { animation: shuffleL 1.1s var(--ease) both; animation-delay: calc(var(--i) * 70ms); }
+.deck.is-shuffling .deck-card:nth-child(even) { animation-name: shuffleR; }
+@keyframes shuffleL { 35% { transform: translate(-34%, -4%) rotate(-9deg); } 70% { transform: translate(-4%, 1%) rotate(2deg); } }
+@keyframes shuffleR { 35% { transform: translate(34%, 4%) rotate(9deg); }  70% { transform: translate(4%, -1%) rotate(-2deg); } }
+
+/* the top card turns edge-on ... and the real card turns in */
+.deck.is-lifting .deck-card:first-child {
+  transform: translateY(-14px) perspective(900px) rotateY(90deg) scale(1.05);
+  transition: transform .38s cubic-bezier(.5, 0, .9, .6);
+}
+
+.draw-slot { position: absolute; inset: 0; }
+.slot-card { width: 100%; height: 100%; }
+.slot-card .card { height: 100%; }
+.slot-card.is-revealing { animation: reveal .8s var(--ease) both; }
+.slot-card.is-revealing .card-inner { animation: revealGlow 2.4s ease-out both; }
+@keyframes reveal {
+  from { transform: perspective(1100px) rotateY(-90deg) scale(.92); opacity: 0; }
+  35%  { opacity: 1; }
+  to   { transform: perspective(1100px) rotateY(0) scale(1); }
+}
+@keyframes revealGlow { 0% { box-shadow: 0 0 0 2px var(--gold-bright), 0 0 80px 10px rgba(243, 217, 143, .7); } 100% { box-shadow: var(--shadow-card); } }
+
+/* ---- DRAW: text panel -------------------------------------------------------- */
+.draw-panel { text-align: center; min-width: 0; }
+@media (min-width: 860px) { .draw-panel { text-align: left; } }
+.draw-title {
+  margin: 4px 0 10px;
+  font-family: var(--font-display); font-weight: 600; line-height: 1.08;
+  font-size: clamp(2rem, 5.2vw, 3.1rem);
+}
+.draw-lead {
+  margin: 0 auto 22px; max-width: 30rem;
+  font-family: var(--font-display); font-style: italic; font-size: 1.22rem; color: var(--text-muted);
+}
+@media (min-width: 860px) { .draw-lead { margin-inline: 0; } }
+.mini { margin: 16px 0 0; font-size: .78rem; letter-spacing: .04em; color: var(--text-muted); }
+.status-msg { min-height: 1.5em; margin: 12px 0 0; color: var(--gold-bright); font-size: .92rem; }
+
+.field-label {
+  display: block; text-align: left; margin: 20px 0 6px;
+  font: 600 .74rem var(--font-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--gold);
+}
+#reflect {
+  width: 100%; min-height: 112px; padding: 13px 15px; resize: vertical;
+  border-radius: 14px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--text);
+  font: 400 1rem/1.5 var(--font-ui);
+  transition: border-color .25s, box-shadow .25s, background .25s;
+}
+#reflect::placeholder { color: var(--text-muted); }
+#reflect:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(216, 180, 90, .18); background: var(--surface-strong); }
+.draw-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; justify-content: center; }
+@media (min-width: 860px) { .draw-actions { justify-content: flex-start; } }
+
+/* ---- MY JOURNEY: tree + stats + journal -------------------------------------- */
+.journey { display: grid; gap: 22px; padding-block: 26px 36px; }
+
+.tree-card {
+  display: grid; gap: 18px; justify-items: center; text-align: center;
+  padding: clamp(18px, 4vw, 34px);
+  border-radius: 22px; border: 1px solid var(--line);
+  background: radial-gradient(560px 280px at 20% 0%, var(--bg-glow), transparent 70%), var(--surface);
+}
+@media (min-width: 720px) {
+  .tree-card { grid-template-columns: 270px 1fr; justify-items: start; text-align: left; gap: 40px; align-items: center; }
+  .tree-card .draw-lead { margin-inline: 0; }
+}
+.tree-svg { width: min(68vw, 250px); height: min(76vw, 280px); }
+.tree-svg svg { display: block; width: 100%; height: 100%; transform-origin: 50% 92%; animation: grow 1s var(--ease) both; }
+@keyframes grow { from { transform: scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.t-ground { fill: rgba(216, 180, 90, .14); }
+.t-mound  { fill: #5a4128; }
+.t-seed   { fill: var(--gold-bright); filter: drop-shadow(0 0 6px rgba(243, 217, 143, .8)); }
+.t-stem   { fill: none; stroke: var(--leaf-2); stroke-width: 4; stroke-linecap: round; }
+.t-trunk  { fill: var(--trunk); }
+.t-branch { fill: none; stroke: var(--trunk); stroke-width: 5; stroke-linecap: round; }
+.t-leaf   { fill: var(--leaf-1); }
+.t-leaf2  { fill: var(--leaf-2); }
+.t-fruit  { fill: var(--gold-bright); stroke: var(--gold-deep); stroke-width: .8; filter: drop-shadow(0 0 4px rgba(243, 217, 143, .9)); }
+.t-rays line { stroke: var(--gold); stroke-width: 2; stroke-linecap: round; opacity: .35; }
+
+.progress { height: 8px; max-width: 26rem; margin: 6px auto 0; border-radius: 999px; background: var(--surface-strong); overflow: hidden; }
+@media (min-width: 720px) { .progress { margin-inline: 0; } }
+.progress span { display: block; height: 100%; width: 4%; border-radius: inherit; background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright)); transition: width .9s var(--ease); }
+
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (min-width: 720px) { .stats { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+.stat { padding: 16px 10px; text-align: center; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.stat-n { display: block; font-family: var(--font-display); font-weight: 600; font-size: 2.4rem; line-height: 1.1; color: var(--gold-bright); }
+.stat-l { font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted); }
+
+.journal-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.journal-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.9rem; }
+.journal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.entries { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.entry {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; align-items: start;
+  padding: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
+}
+.entry-thumb { width: 64px; aspect-ratio: var(--card-ratio); padding: 0; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; background: var(--placeholder-a); cursor: pointer; }
+.entry-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.entry-date { margin: 0; font-size: .75rem; letter-spacing: .04em; color: var(--text-muted); }
+.entry-title { margin: 2px 0 6px; font-family: var(--font-display); font-weight: 600; font-size: 1.28rem; line-height: 1.2; }
+.entry-title span { color: var(--gold); margin-right: 4px; }
+.entry-note { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.entry-note.is-empty { color: var(--text-muted); font-style: italic; }
+.entry-del { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--text-muted); cursor: pointer; }
+.entry-del:hover { background: var(--surface-strong); color: var(--text); }
+
 </style>
 </head>
 
@@ -742,6 +924,110 @@ html, body {
 
     <!-- Notices (demo mode, odd number of images …) -->
     <div class="container"><p class="notice" id="notice" role="status" hidden></p></div>
+
+
+    <!-- ---------- Tab bar: Draw | My Journey | Library (sticky) ---------- -->
+    <nav class="tabbar-wrap" id="tabbar" aria-label="COR DEO">
+      <div class="container tabbar" role="tablist">
+        <button type="button" role="tab" class="tab" id="tab-draw" data-tab="draw" aria-selected="true" aria-controls="view-draw">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="11" height="16" rx="2"/><path d="M9 21h8a2 2 0 0 0 2-2V8"/></svg>
+          <span data-i18n="tabDraw">Ziehen</span>
+        </button>
+        <button type="button" role="tab" class="tab" id="tab-journey" data-tab="journey" aria-selected="false" aria-controls="view-journey" tabindex="-1">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 12c-4 0-6-2.5-6-6 4 0 6 2 6 6Z"/><path d="M12 14c3.500 0 6-2 6-5.500-3.500 0-6 2-6 5.500Z"/></svg>
+          <span data-i18n="tabJourney">Mein Weg</span>
+        </button>
+        <button type="button" role="tab" class="tab" id="tab-library" data-tab="library" aria-selected="false" aria-controls="view-library" tabindex="-1">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.500"/><rect x="14" y="3" width="7" height="7" rx="1.500"/><rect x="3" y="14" width="7" height="7" rx="1.500"/><rect x="14" y="14" width="7" height="7" rx="1.500"/></svg>
+          <span data-i18n="tabLibrary">Bibliothek</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ======================  VIEW 1: DRAW YOUR CARD  ====================== -->
+    <section class="view" id="view-draw" data-view="draw" role="tabpanel" aria-labelledby="tab-draw">
+      <div class="container draw">
+
+        <div class="draw-stage" id="drawStage">
+          <div class="deck" id="deck" aria-hidden="true"></div>      <!-- the face-down stack (built by JS) -->
+          <div class="draw-slot" id="drawSlot"></div>                  <!-- the drawn card appears here -->
+        </div>
+
+        <div class="draw-panel">
+
+          <!-- before drawing -->
+          <div id="drawIdle">
+            <p class="kicker" data-i18n="cardOfTheDay">Karte des Tages</p>
+            <h2 class="draw-title" data-i18n="drawTitle">Ziehe deine Karte</h2>
+            <p class="draw-lead" data-i18n="drawLead"></p>
+            <button type="button" class="btn btn-primary btn-xl" id="drawBtn">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.900 5.100L19 10l-5.100 1.900L12 17l-1.900-5.100L5 10l5.100-1.900Z"/><path d="M19 17l.7 1.800L21.500 19.500l-1.800.7L19 22l-.7-1.800-1.800-.7 1.800-.7Z"/></svg>
+              <span data-i18n="drawBtn">Ziehe deine Karte</span>
+            </button>
+            <p class="mini" data-i18n="localNote"></p>
+          </div>
+
+          <!-- after drawing -->
+          <div id="drawResult" hidden>
+            <p class="kicker" data-i18n="drawnToday">Deine Karte für heute</p>
+            <h2 class="draw-title" id="resultTitle" tabindex="-1"></h2>
+            <p class="draw-lead" data-i18n="tapToFlip"></p>
+
+            <label class="field-label" for="reflect" data-i18n="reflectLabel">Deine Reflexion</label>
+            <textarea id="reflect" rows="4" maxlength="1200" data-i18n-placeholder="reflectPlaceholder" placeholder=""></textarea>
+
+            <div class="draw-actions">
+              <button type="button" class="btn btn-primary" id="completeBtn" data-i18n="completeBtn">Heute reflektiert ✓</button>
+              <button type="button" class="btn btn-ghost" id="drawLarge" data-i18n="viewLarge">Groß ansehen</button>
+              <button type="button" class="btn btn-ghost" id="drawAgain" data-i18n="drawAgain">Neue Karte ziehen</button>
+            </div>
+            <p class="status-msg" id="completeMsg" role="status"></p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================  VIEW 2: MY JOURNEY  ====================== -->
+    <section class="view" id="view-journey" data-view="journey" role="tabpanel" aria-labelledby="tab-journey" hidden>
+      <div class="container journey">
+
+        <div class="tree-card">
+          <div class="tree-svg" id="tree" role="img" aria-label=""></div>
+          <div class="tree-info">
+            <p class="kicker" id="phaseKicker"></p>
+            <h2 class="draw-title" id="phaseName"></h2>
+            <p class="draw-lead" id="phaseNote"></p>
+            <div class="progress" aria-hidden="true"><span id="phaseBar"></span></div>
+            <p class="mini" id="nextPhase"></p>
+          </div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <p class="notice" id="graceMsg" hidden></p>
+        <p class="notice" id="storageWarn" hidden></p>
+
+        <div class="journal-head">
+          <h2 class="journal-title" data-i18n="journalTitle">Mein Tagebuch</h2>
+          <div class="journal-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="copyAll" data-i18n="copyAll">Alles kopieren</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="saveFile" data-i18n="saveFile">Als Datei sichern</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="resetAll" data-i18n="resetAll">Alles zurücksetzen</button>
+          </div>
+        </div>
+        <p class="status-msg" id="journalMsg" role="status"></p>
+
+        <ol class="entries" id="entries"></ol>
+        <div class="empty" id="journalEmpty" hidden>
+          <p data-i18n="journalEmpty"></p>
+          <button type="button" class="btn btn-primary" id="goDraw" data-i18n="goDraw">Karte ziehen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================  VIEW 3: LIBRARY (all 60 cards)  ====================== -->
+    <div class="view" id="view-library" data-view="library" role="tabpanel" aria-labelledby="tab-library" hidden>
 
     <!-- ---------- Card of the Day ---------- -->
     <section class="container hero-wrap" id="hero" aria-labelledby="heroKicker">
@@ -797,6 +1083,8 @@ html, body {
         <button type="button" class="btn btn-ghost" id="emptyClear" data-i18n="clearSearch">Clear search</button>
       </div>
     </div>
+
+    </div><!-- /view-library -->
 
     <footer class="container footer">
       <div class="ornament" aria-hidden="true"><span></span><i></i><span></span></div>
@@ -886,7 +1174,7 @@ html, body {
 window.COR_DEO_CONFIG = {
 
   deckTitle: "COR DEO",
-  tagline:   "A card deck for prayer & reflection",
+  tagline:   "Gottes Wille für Seine Kinder",
 
   // "dark" (midnight & gold), "light" (ivory & gold) or "auto" (follows the
   // visitor's device). Can also be overridden in the page URL: ?theme=light
@@ -894,8 +1182,18 @@ window.COR_DEO_CONFIG = {
 
   // Language / direction of the interface. Leave "" for the browser default.
   // Example for Arabic: lang: "ar", dir: "rtl"
-  lang: "",
+  lang: "de",
   dir:  "",
+
+  // Language of the buttons and texts: "de" (German, default) or "en" (English).
+  uiLang: "de",
+
+  // Which cards can be drawn on the "Ziehe deine Karte" page (card numbers).
+  // null = a sensible default: the "Der Wille des Vaters ist …" cards, without duplicates.
+  drawPool: null,
+
+  // Optional: picture shown on the back of the face-down deck. Empty = your cover card (card 1).
+  deckBack: "",
 
   // Which image is visible first? "front" (default) or "back".
   startFace: "front",
@@ -1058,50 +1356,94 @@ window.COR_DEO_META = {
      1. CONFIGURATION & TEXT STRINGS
      ========================================================================== */
   var CFG = Object.assign({
-    deckTitle: "COR DEO", tagline: "", theme: "dark", lang: "", dir: "",
+    deckTitle: "COR DEO", tagline: "", theme: "dark", lang: "", dir: "", uiLang: "de", drawPool: null, deckBack: "",
     startFace: "front", cardAspectRatio: "auto", imageFit: "cover",
     randomFlipsCard: true, longPressMs: 550,
     imagePattern: "", imageCount: 120, imagePad: 0, imageBase: "", strings: {}
   }, window.COR_DEO_CONFIG || {});
 
-  var STR = Object.assign({
-    cardOfTheDay: "Card of the Day",
-    cardOfTheDayHint: "Tap the card to turn it over.",
-    showInDeck: "Find in deck",
-    viewLarge: "View large",
-    searchPlaceholder: "Search by number or title…",
-    searchLabel: "Search cards",
-    clearSearch: "Clear search",
-    randomCard: "Random Card",
-    densityLabel: "Card size",
-    densityStandard: "Standard",
-    densityLarge: "Large",
-    noResults: "No cards match your search.",
-    viewerLabel: "Card viewer",
-    flipCard: "Flip card",
-    enterFullscreen: "Toggle full screen",
-    close: "Close",
-    fitScreen: "Fit screen",
-    exitFit: "Exit fit",
-    previous: "Previous card",
-    next: "Next card",
-    viewerHint: "Tap the card to flip · swipe or use ← → to browse",
-    card: "Card",
-    front: "Front",
-    back: "Back",
-    of: "of",
-    showing: "Showing {n} of {total} cards",
-    allCards: "{total} cards",
-    footer: "{title} · {total} cards",
-    imageUnavailable: "Image unavailable",
-    retry: "Retry",
-    randomAnnounce: "Random card: {name}",
-    openLarge: "Open card {name} full screen",
-    flipAria: "{name}. Press to flip.",
-    demoNotice: "<strong>Preview mode.</strong> Add your image URLs in <code>js/cards-data.js</code> to replace these sample cards.",
-    oddNotice: "<strong>Heads-up:</strong> {n} image URLs were found — cards need pairs (front + back). The last image was ignored.",
-    patternNotice: ""
-  }, CFG.strings || {});
+  /* --------------------------------------------------------------------------
+     Interface texts. German is the default (your cards are German); English is
+     built in too: set  uiLang: "en"  in js/cards-data.js. You can also override
+     single texts with  strings: { drawBtn: "..." }  in the same file.
+     -------------------------------------------------------------------------- */
+  var I18N = {
+    en: {
+      cardOfTheDay: "Card of the Day", cardOfTheDayHint: "Tap the card to turn it over.",
+      showInDeck: "Find in library", viewLarge: "View large",
+      searchPlaceholder: "Search by number, title or keyword…", searchLabel: "Search cards", clearSearch: "Clear search",
+      randomCard: "Random Card", densityLabel: "Card size", densityStandard: "Standard", densityLarge: "Large",
+      noResults: "No cards match your search.", viewerLabel: "Card viewer", flipCard: "Flip card",
+      enterFullscreen: "Toggle full screen", close: "Close", fitScreen: "Fit screen", exitFit: "Exit fit",
+      previous: "Previous card", next: "Next card",
+      viewerHint: "Tap the card to flip · swipe or use ← → to browse",
+      card: "Card", front: "Front", back: "Back", of: "of",
+      showing: "Showing {n} of {total} cards", allCards: "{total} cards", footer: "{title} · {total} cards",
+      imageUnavailable: "Image unavailable", retry: "Retry",
+      randomAnnounce: "Random card: {name}", openLarge: "Open card {name} full screen", flipAria: "{name}. Press to flip.",
+      demoNotice: "<strong>Preview mode.</strong> Add your image URLs in <code>js/cards-data.js</code> to replace these sample cards.",
+      oddNotice: "<strong>Heads-up:</strong> {n} image URLs were found — cards need pairs (front + back). The last image was ignored.",
+      tabDraw: "Draw", tabJourney: "My Journey", tabLibrary: "Library",
+      drawTitle: "Draw your card", drawLead: "Take a breath. Ask yourself: What does God's heart wish for you today?",
+      drawBtn: "Draw your card", localNote: "Saved on this device only.", shuffling: "Shuffling the deck…",
+      drawnToday: "Your card for today", tapToFlip: "Tap the card to read its back.",
+      reflectLabel: "Your reflection", reflectPlaceholder: "What is God saying to you through this card? Write a prayer or one next step…",
+      completeBtn: "Reflected today ✓", updateBtn: "Update reflection", drawAgain: "Draw another card",
+      savedMsg: "Saved. May God bless this step.", doneToday: "You have already reflected today — well done.",
+      newRound: "You have discovered every card! A new round begins.",
+      streakDays: "{n} days in a row", totalDays: "{n} days in total", fruits: "{n} fruits on the tree", discovered: "{n} of {total} cards discovered",
+      statStreak: "In a row", statDays: "Days", statFruits: "Fruits", statCards: "Discovered",
+      phaseWord: "Phase", phase0: "The seed is sown", phase1: "Awakening & Foundation", phase2: "Forming & Refining",
+      phase3: "Active Life & Fruitfulness", phase4: "Enduring & Eternal Hope",
+      phaseNote0: "Draw your first card and plant the seed.", phaseNote1: "A first shoot is growing. Keep coming back.",
+      phaseNote2: "Roots are deepening. God is shaping you.", phaseNote3: "Your tree is bearing fruit.", phaseNote4: "A tree planted by streams of water. Stay faithful.",
+      nextPhase: "{n} more days until “{name}”", nextPhaseOne: "1 more day until “{name}”", maxPhase: "You have reached the highest phase — keep walking.",
+      graceMsg: "Missed a few days? “His mercies are new every morning.” (Lam 3:23) Draw a card and begin again.",
+      storageWarn: "This browser does not allow saving — your progress will be lost when you close the page. Use “Save as file” to keep your notes.",
+      journalTitle: "My Journal", journalEmpty: "No entries yet. Draw your first card and write down what God shows you.",
+      goDraw: "Draw a card", copyAll: "Copy all", saveFile: "Save as file", resetAll: "Reset everything",
+      resetConfirm: "Really delete everything? Click again.", copied: "Copied.", copyFail: "Copying was not possible here.",
+      deleteEntry: "Delete entry", noNote: "(no note)", journalHeading: "COR DEO – My Journal", openCard: "Open card"
+    },
+    de: {
+      cardOfTheDay: "Karte des Tages", cardOfTheDayHint: "Tippe auf die Karte, um sie umzudrehen.",
+      showInDeck: "In der Bibliothek zeigen", viewLarge: "Groß ansehen",
+      searchPlaceholder: "Nach Nummer, Titel oder Stichwort suchen…", searchLabel: "Karten durchsuchen", clearSearch: "Suche löschen",
+      randomCard: "Zufällige Karte", densityLabel: "Kartengröße", densityStandard: "Standard", densityLarge: "Groß",
+      noResults: "Keine Karte passt zu deiner Suche.", viewerLabel: "Kartenansicht", flipCard: "Karte umdrehen",
+      enterFullscreen: "Vollbild umschalten", close: "Schließen", fitScreen: "Bildschirm füllen", exitFit: "Normal",
+      previous: "Vorherige Karte", next: "Nächste Karte",
+      viewerHint: "Tippe die Karte zum Umdrehen · wische oder nutze ← → zum Blättern",
+      card: "Karte", front: "Vorderseite", back: "Rückseite", of: "von",
+      showing: "{n} von {total} Karten", allCards: "{total} Karten", footer: "{title} · {total} Karten",
+      imageUnavailable: "Bild nicht verfügbar", retry: "Erneut versuchen",
+      randomAnnounce: "Zufällige Karte: {name}", openLarge: "Karte {name} groß ansehen", flipAria: "{name}. Zum Umdrehen drücken.",
+      demoNotice: "<strong>Vorschau-Modus.</strong> Trage deine Bild-Adressen in <code>js/cards-data.js</code> ein, um diese Beispielkarten zu ersetzen.",
+      oddNotice: "<strong>Hinweis:</strong> {n} Bild-Adressen gefunden – Karten brauchen Paare (Vorder- und Rückseite). Das letzte Bild wurde ignoriert.",
+      tabDraw: "Ziehen", tabJourney: "Mein Weg", tabLibrary: "Bibliothek",
+      drawTitle: "Ziehe deine Karte", drawLead: "Atme durch. Frage dich: Was wünscht sich Gottes Herz heute für dich?",
+      drawBtn: "Ziehe deine Karte", localNote: "Nur auf diesem Gerät gespeichert.", shuffling: "Die Karten werden gemischt…",
+      drawnToday: "Deine Karte für heute", tapToFlip: "Tippe die Karte, um die Rückseite zu lesen.",
+      reflectLabel: "Deine Reflexion", reflectPlaceholder: "Was sagt Gott dir heute durch diese Karte? Schreibe ein Gebet oder einen nächsten Schritt auf…",
+      completeBtn: "Heute reflektiert ✓", updateBtn: "Reflexion aktualisieren", drawAgain: "Neue Karte ziehen",
+      savedMsg: "Gespeichert. Gott segne diesen Schritt.", doneToday: "Du hast heute schon reflektiert – gut gemacht.",
+      newRound: "Du hast alle Karten entdeckt! Eine neue Runde beginnt.",
+      streakDays: "{n} Tage in Folge", totalDays: "{n} Tage insgesamt", fruits: "{n} Früchte am Baum", discovered: "{n} von {total} Karten entdeckt",
+      statStreak: "In Folge", statDays: "Tage", statFruits: "Früchte", statCards: "Entdeckt",
+      phaseWord: "Phase", phase0: "Der Same ist gesät", phase1: "Erwachen & Grundlage", phase2: "Formung & Verfeinerung",
+      phase3: "Aktives Leben & Fruchtbarkeit", phase4: "Anhaltendes Ausharren & Ewige Hoffnung",
+      phaseNote0: "Ziehe deine erste Karte und pflanze den Samen.", phaseNote1: "Ein erster Trieb wächst. Komm immer wieder.",
+      phaseNote2: "Die Wurzeln gehen tiefer. Gott formt dich.", phaseNote3: "Dein Baum trägt Frucht.", phaseNote4: "Ein Baum an Wasserbächen gepflanzt. Bleib treu.",
+      nextPhase: "Noch {n} Tage bis „{name}“", nextPhaseOne: "Noch 1 Tag bis „{name}“", maxPhase: "Du hast die höchste Phase erreicht – geh weiter.",
+      graceMsg: "Ein paar Tage verpasst? „Seine Gnade ist jeden Morgen neu.“ (Klgl 3,23) Ziehe eine Karte und fang neu an.",
+      storageWarn: "Dieser Browser erlaubt kein Speichern – dein Fortschritt geht beim Schließen verloren. Sichere deine Notizen mit „Als Datei sichern“.",
+      journalTitle: "Mein Tagebuch", journalEmpty: "Noch keine Einträge. Ziehe deine erste Karte und schreibe auf, was Gott dir zeigt.",
+      goDraw: "Karte ziehen", copyAll: "Alles kopieren", saveFile: "Als Datei sichern", resetAll: "Alles zurücksetzen",
+      resetConfirm: "Wirklich alles löschen? Noch einmal klicken.", copied: "Kopiert.", copyFail: "Kopieren war hier nicht möglich.",
+      deleteEntry: "Eintrag löschen", noNote: "(ohne Notiz)", journalHeading: "COR DEO – Mein Tagebuch", openCard: "Karte öffnen"
+    }
+  };
+  var STR = Object.assign({}, I18N.en, I18N[CFG.uiLang] || {}, CFG.strings || {});
 
   /** Replace {placeholders} in a string. */
   function fmt(s, vars) {
@@ -1540,10 +1882,11 @@ window.COR_DEO_META = {
   function highlight(index, flip) {
     var g = gridCards[index];
     if (!g) return;
+    if (window.CorDeoApp && window.CorDeoApp.showView) window.CorDeoApp.showView("library");   // the grid lives in the Library tab
     if (g.item.hidden) { $("search").value = ""; applySearch(); }
 
     var app = $("app");
-    var bar = $("toolbar").offsetHeight;
+    var bar = $("toolbar").offsetHeight + ($("tabbar") ? $("tabbar").offsetHeight : 0);
     var top = g.item.getBoundingClientRect().top - app.getBoundingClientRect().top + app.scrollTop;
     app.scrollTo({ top: Math.max(0, top - bar - (app.clientHeight - bar - g.item.offsetHeight) / 2), behavior: "smooth" });
 
@@ -1945,6 +2288,12 @@ window.COR_DEO_META = {
     renderHero();
     setupViewer();
 
+    // Small public API used by js/journey.js (draw page, journal, tree)
+    window.CorDeoApp = {
+      cards: cards, CFG: CFG, STR: STR, fmt: fmt, el: el, store: store, pad2: pad2,
+      buildCard: buildCard, openViewer: openViewer, highlight: highlight, loadFace: loadFace
+    };
+
     // Initial state of the filter
     visible = cards.map(function (c) { return c.index; });
     updateStatus("");
@@ -1970,6 +2319,533 @@ window.COR_DEO_META = {
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
+
+})();
+
+</script>
+  <script>
+/* ============================================================================
+   COR DEO — "ZIEHE DEINE KARTE", REFLECTION JOURNAL, GROWING TREE & STREAK
+   ----------------------------------------------------------------------------
+   Loaded AFTER js/app.js. It only uses the small public API that app.js
+   exposes as window.CorDeoApp, so the two files stay independent.
+
+   Sections
+     1.  Boot, tabs (Draw | My Journey | Library)
+     2.  Saved data (localStorage with a safe fallback)
+     3.  Dates, streak and phase maths
+     4.  The face-down deck and the draw ritual
+     5.  Reflection (save a note, "Heute reflektiert ✓")
+     6.  My Journey: growing tree, statistics, journal
+     7.  Copy / save / reset
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  var A, CFG, STR, cards, $ = function (id) { return document.getElementById(id); };
+
+  /* ==========================================================================
+     1. BOOT + TABS
+     ========================================================================== */
+  function boot() {
+    A = window.CorDeoApp;
+    if (!A) return;                                   // app.js found no cards: nothing to do
+    CFG = A.CFG; STR = A.STR; cards = A.cards;
+
+    initPool();
+    state = loadState();
+    setupTabs();
+    buildDeck();
+    wireDraw();
+    wireJourney();
+    restoreToday();
+    showView("draw", false);
+    renderJourney();
+  }
+
+  var VIEWS = ["draw", "journey", "library"];
+
+  /** Show one of the three views. Also exposed to app.js (Random Card etc. need the Library). */
+  function showView(name, scrollUp) {
+    if (VIEWS.indexOf(name) < 0) name = "draw";
+    VIEWS.forEach(function (v) {
+      var view = $("view-" + v), tab = $("tab-" + v);
+      var on = v === name;
+      view.hidden = !on;
+      tab.setAttribute("aria-selected", on ? "true" : "false");
+      tab.tabIndex = on ? 0 : -1;
+    });
+    if (name === "journey") renderJourney();
+    if (scrollUp !== false) {
+      var app = $("app"), top = $("tabbar").offsetTop;
+      if (app.scrollTop > top) app.scrollTo({ top: top, behavior: "auto" });
+    }
+  }
+
+  function setupTabs() {
+    A.showView = showView;
+    function setBarHeight() { document.documentElement.style.setProperty("--tabs-h", $("tabbar").offsetHeight + "px"); }
+    setBarHeight();
+    window.addEventListener("resize", setBarHeight);
+
+    var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { showView(t.dataset.tab); });
+      t.addEventListener("keydown", function (e) {                       // ← → move between tabs
+        var d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var next = tabs[(i + d + tabs.length) % tabs.length];
+        showView(next.dataset.tab); next.focus();
+      });
+    });
+  }
+
+  /* ==========================================================================
+     2. SAVED DATA
+     --------------------------------------------------------------------------
+     Everything is stored in the visitor's own browser (localStorage). There is
+     no server and no account. If the browser blocks storage (some embeds do),
+     the app still works for the current visit and shows a hint.
+     ========================================================================== */
+  var KEY = "cordeo:v1:journey";
+  var state = null, canStore = true, memory = null;
+
+  function emptyState() { return { entries: [], discovered: {}, today: null }; }
+
+  function loadState() {
+    var raw = null;
+    try {
+      window.localStorage.setItem(KEY + ":t", "1"); window.localStorage.removeItem(KEY + ":t");   // is storage really writable?
+      raw = window.localStorage.getItem(KEY);
+    } catch (e) { canStore = false; }
+    var s = emptyState();
+    try { if (raw) s = Object.assign(s, JSON.parse(raw)); } catch (e) { /* damaged data: start fresh */ }
+    if (!Array.isArray(s.entries)) s.entries = [];
+    if (!s.discovered || typeof s.discovered !== "object") s.discovered = {};
+    return s;
+  }
+
+  function saveState() {
+    memory = state;
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { canStore = false; }
+    $("storageWarn").hidden = canStore;
+    $("storageWarn").textContent = canStore ? "" : STR.storageWarn;
+  }
+
+  /* ==========================================================================
+     3. DATES, STREAK AND PHASE MATHS
+     ========================================================================== */
+  function ymd(d) { return d.getFullYear() + "-" + A.pad2(d.getMonth() + 1) + "-" + A.pad2(d.getDate()); }
+  function todayStr() { return ymd(new Date()); }
+  function dayNum(str) { var p = str.split("-"); return Math.floor(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
+
+  function entryDays() {                                  // every date with at least one entry
+    var seen = {};
+    state.entries.forEach(function (e) { seen[e.date] = true; });
+    return Object.keys(seen).sort();
+  }
+
+  function computeStats() {
+    var days = entryDays(), nums = days.map(dayNum), set = {};
+    nums.forEach(function (n) { set[n] = true; });
+    var today = dayNum(todayStr());
+
+    // Current streak counts back from today (or from yesterday if today isn't done yet).
+    var cursor = set[today] ? today : (set[today - 1] ? today - 1 : null), current = 0;
+    while (cursor !== null && set[cursor]) { current++; cursor--; }
+
+    var best = 0, run = 0;
+    nums.forEach(function (n, i) { run = (i > 0 && n === nums[i - 1] + 1) ? run + 1 : 1; if (run > best) best = run; });
+
+    var fruit = {};
+    state.entries.forEach(function (e) { fruit[e.card] = true; });
+    var discovered = Object.keys(state.discovered).length;
+
+    var last = nums.length ? nums[nums.length - 1] : null;
+    return {
+      totalDays: days.length, streak: current, best: best,
+      fruits: Object.keys(fruit).length, discovered: discovered,
+      broken: last !== null && last < today - 1                 // had a streak once, missed 2+ days
+    };
+  }
+
+  // Phases follow the "Reise des Baumes" on your card 15. Days of reflection needed:
+  var PHASE_AT = [0, 1, 5, 15, 30];
+  function levelFor(totalDays) {
+    var lvl = 0;
+    PHASE_AT.forEach(function (n, i) { if (totalDays >= n && i > 0) lvl = i; });
+    return lvl;
+  }
+
+  /* ==========================================================================
+     4. THE FACE-DOWN DECK AND THE DRAW RITUAL
+     ========================================================================== */
+  var pool = [];
+  var busy = false;
+
+  function initPool() {
+    var DEFAULT = [7, 8, 18, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 49, 50, 52, 53, 54, 55, 56, 59];
+    var wanted = (CFG.drawPool && CFG.drawPool.length) ? CFG.drawPool : DEFAULT;
+    pool = wanted.filter(function (n) { return n >= 1 && n <= cards.length; });
+    if (pool.length < 2) pool = cards.map(function (c) { return c.number; });
+  }
+
+  function rand(n) {
+    if (window.crypto && window.crypto.getRandomValues) { var a = new Uint32Array(1); window.crypto.getRandomValues(a); return a[0] % n; }
+    return Math.floor(Math.random() * n);
+  }
+
+  /** Build the stack of face-down cards. Their back design is your cover card (card 1) unless CFG.deckBack is set. */
+  function buildDeck() {
+    var deck = $("deck"), url = CFG.deckBack || cards[0].front;
+    deck.style.setProperty("--deck-bg", 'url("' + url + '")');
+    (new Image()).src = url;
+    deck.innerHTML = "";
+    var tilt = [0, -1.6, 1.4, -0.8, 1.9, -1.2, 0.9];
+    for (var i = 0; i < 7; i++) {
+      var c = A.el("div", "deck-card");
+      c.style.setProperty("--i", i); c.style.setProperty("--r", tilt[i]);
+      c.style.zIndex = 10 - i;
+      deck.appendChild(c);
+    }
+  }
+
+  function reducedMotion() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+
+  function pickCard() {
+    var left = pool.filter(function (n) { return !state.discovered[n]; }), newRound = false;
+    if (!left.length) { state.discovered = {}; left = pool.slice(); newRound = true; }       // every card seen: start a new round
+    if (left.length > 1 && state.today) left = left.filter(function (n) { return n !== state.today.card; });
+    return { n: left[rand(left.length)], newRound: newRound };
+  }
+
+  function wireDraw() {
+    $("drawBtn").addEventListener("click", drawRitual);
+    $("drawAgain").addEventListener("click", resetToIdle);
+    $("drawLarge").addEventListener("click", function () { if (state.today) A.openViewer(state.today.card - 1); });
+    $("completeBtn").addEventListener("click", completeReflection);
+  }
+
+  /** Shuffle -> lift the top card -> turn it over -> show your card. */
+  function drawRitual() {
+    if (busy) return;
+    busy = true;
+    var quick = reducedMotion();
+    var deck = $("deck"), btn = $("drawBtn");
+    btn.disabled = true;
+    $("completeMsg").textContent = "";
+    $("live").textContent = STR.shuffling;
+
+    var pick = pickCard();
+    deck.classList.add("is-shuffling");
+
+    setTimeout(function () {                                   // 1. shuffle is over: lift the top card edge-on
+      deck.classList.remove("is-shuffling");
+      deck.classList.add("is-lifting");
+      setTimeout(function () {                                 // 2. the face-up card turns in
+        state.discovered[pick.n] = true;
+        state.today = { date: todayStr(), card: pick.n };
+        saveState();
+        showResult(pick.n, true);
+        deck.classList.add("is-gone");
+        busy = false; btn.disabled = false;
+        if (pick.newRound) $("completeMsg").textContent = STR.newRound;
+      }, quick ? 0 : 380);
+    }, quick ? 0 : 1250);
+  }
+
+  /** Put a drawn card on the table and switch the side panel to "result". */
+  function showResult(n, animate) {
+    var model = cards[n - 1];
+    var slot = $("drawSlot");
+    slot.innerHTML = "";
+    var wrap = A.el("div", "slot-card" + (animate ? " is-revealing" : ""));
+    wrap.appendChild(A.buildCard(model, { eager: true, onOpen: function (i) { A.openViewer(i); } }));
+    slot.appendChild(wrap);
+
+    var title = model.title ? model.title : STR.card + " " + model.number;
+    $("resultTitle").textContent = title;
+    $("drawIdle").hidden = true;
+    $("drawResult").hidden = false;
+
+    var existing = findEntry(todayStr(), n);
+    $("reflect").value = existing ? existing.note : "";
+    $("completeBtn").textContent = existing ? STR.updateBtn : STR.completeBtn;
+    if (existing && !animate) $("completeMsg").textContent = STR.doneToday;
+    $("live").textContent = STR.drawnToday + ": " + title;
+    if (animate) { try { $("resultTitle").focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+  }
+
+  function resetToIdle() {
+    var deck = $("deck");
+    deck.classList.remove("is-lifting", "is-gone", "is-shuffling");
+    $("drawSlot").innerHTML = "";
+    $("drawResult").hidden = true;
+    $("drawIdle").hidden = false;
+    $("reflect").value = "";
+    $("completeMsg").textContent = "";
+    $("drawBtn").focus({ preventScroll: true });
+  }
+
+  /** Coming back on the same day: show today's card again without the ritual. */
+  function restoreToday() {
+    if (state.today && state.today.date === todayStr() && cards[state.today.card - 1]) {
+      $("deck").classList.add("is-lifting", "is-gone");
+      showResult(state.today.card, false);
+    }
+  }
+
+  /* ==========================================================================
+     5. REFLECTION
+     ========================================================================== */
+  function findEntry(date, cardNo) {
+    for (var i = 0; i < state.entries.length; i++) if (state.entries[i].date === date && state.entries[i].card === cardNo) return state.entries[i];
+    return null;
+  }
+
+  function completeReflection() {
+    if (!state.today) return;
+    var before = computeStats(), beforeLevel = levelFor(before.totalDays);
+    var note = $("reflect").value.trim();
+    var date = todayStr(), cardNo = state.today.card;
+    var entry = findEntry(date, cardNo);
+    if (entry) { entry.note = note; entry.ts = Date.now(); }
+    else state.entries.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: date, ts: Date.now(), card: cardNo, note: note });
+    saveState();
+
+    var after = computeStats(), afterLevel = levelFor(after.totalDays);
+    var msg = STR.savedMsg;
+    if (afterLevel > beforeLevel) msg = "🌱 " + STR.phaseWord + " " + afterLevel + ": " + STR["phase" + afterLevel] + " — " + msg;
+    else if (after.streak > 1) msg += " " + A.fmt(STR.streakDays, { n: after.streak }) + ".";
+    $("completeMsg").textContent = msg;
+    $("completeBtn").textContent = STR.updateBtn;
+    renderJourney();
+  }
+
+  /* ==========================================================================
+     6. MY JOURNEY: TREE, STATISTICS, JOURNAL
+     ========================================================================== */
+  function wireJourney() {
+    $("goDraw").addEventListener("click", function () { showView("draw"); });
+    $("copyAll").addEventListener("click", copyAll);
+    $("saveFile").addEventListener("click", saveFile);
+    $("resetAll").addEventListener("click", resetAll);
+    $("entries").addEventListener("click", function (e) {
+      var del = e.target.closest("[data-del]"), open = e.target.closest("[data-open]");
+      if (del) { deleteEntry(del.getAttribute("data-del")); }
+      else if (open) { A.openViewer(+open.getAttribute("data-open") - 1); }
+    });
+  }
+
+  function renderJourney() {
+    if (!state) return;
+    var st = computeStats(), lvl = levelFor(st.totalDays);
+
+    // ---- phase text + progress bar
+    $("phaseKicker").textContent = lvl === 0 ? STR.tabJourney : STR.phaseWord + " " + lvl;
+    $("phaseName").textContent = STR["phase" + lvl];
+    $("phaseNote").textContent = STR["phaseNote" + lvl];
+    var bar = 1, next = "";
+    if (lvl < 4) {
+      var from = PHASE_AT[lvl], to = PHASE_AT[lvl + 1];
+      bar = (st.totalDays - from) / (to - from);
+      next = A.fmt((to - st.totalDays === 1) ? STR.nextPhaseOne : STR.nextPhase, { n: to - st.totalDays, name: STR["phase" + (lvl + 1)] });
+    } else next = STR.maxPhase;
+    $("phaseBar").style.width = Math.round(Math.max(0.04, Math.min(1, bar)) * 100) + "%";
+    $("nextPhase").textContent = next;
+
+    // ---- tree
+    var tree = $("tree");
+    var key = lvl + ":" + st.fruits;
+    if (tree.getAttribute("data-key") !== key) {
+      tree.innerHTML = treeSVG(lvl, st.fruits);
+      tree.setAttribute("data-key", key);
+    }
+    tree.setAttribute("aria-label", STR["phase" + lvl] + " · " + A.fmt(STR.fruits, { n: st.fruits }));
+
+    // ---- stat tiles
+    var tiles = [
+      [st.streak, STR.statStreak], [st.totalDays, STR.statDays],
+      [st.fruits, STR.statFruits], [st.discovered + "/" + pool.length, STR.statCards]
+    ];
+    $("stats").innerHTML = tiles.map(function (t) {
+      return '<div class="stat"><span class="stat-n">' + t[0] + '</span><span class="stat-l">' + t[1] + "</span></div>";
+    }).join("");
+
+    // ---- gentle messages
+    $("graceMsg").hidden = !(st.broken && st.streak === 0);
+    $("graceMsg").textContent = STR.graceMsg;
+    $("storageWarn").hidden = canStore;
+    $("storageWarn").textContent = canStore ? "" : STR.storageWarn;
+
+    renderEntries();
+  }
+
+  function fmtDate(str) {
+    var p = str.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2]);
+    try { return d.toLocaleDateString(CFG.lang || undefined, { weekday: "short", day: "numeric", month: "long", year: "numeric" }); }
+    catch (e) { return str; }
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function renderEntries() {
+    var list = state.entries.slice().sort(function (a, b) { return b.ts - a.ts; });
+    $("journalEmpty").hidden = list.length > 0;
+    $("entries").hidden = list.length === 0;
+    $("copyAll").disabled = $("saveFile").disabled = list.length === 0;
+    $("entries").innerHTML = list.map(function (e) {
+      var m = cards[e.card - 1]; if (!m) return "";
+      var title = m.title ? m.title : STR.card + " " + m.number;
+      return '<li class="entry">' +
+        '<button type="button" class="entry-thumb" data-open="' + m.number + '" aria-label="' + esc(STR.openCard + ": " + title) + '">' +
+          '<img src="' + esc(m.front) + '" alt="" loading="lazy" decoding="async"></button>' +
+        '<div class="entry-body"><p class="entry-date">' + esc(fmtDate(e.date)) + '</p>' +
+          '<h3 class="entry-title"><span>' + A.pad2(m.number) + '</span> ' + esc(title) + '</h3>' +
+          '<p class="entry-note' + (e.note ? "" : " is-empty") + '">' + (e.note ? esc(e.note) : esc(STR.noNote)) + '</p></div>' +
+        '<button type="button" class="entry-del" data-del="' + esc(e.id) + '" aria-label="' + esc(STR.deleteEntry) + '" title="' + esc(STR.deleteEntry) + '">' +
+          '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></li>';
+    }).join("");
+  }
+
+  function deleteEntry(id) {
+    state.entries = state.entries.filter(function (e) { return e.id !== id; });
+    saveState();
+    // If today's card no longer has an entry, the draw page goes back to "not yet reflected".
+    if (state.today && state.today.date === todayStr() && !$("drawResult").hidden) {
+      var ex = findEntry(todayStr(), state.today.card);
+      $("completeBtn").textContent = ex ? STR.updateBtn : STR.completeBtn;
+      $("completeMsg").textContent = "";
+    }
+    renderJourney();
+  }
+
+  /* ---- the tree (inline SVG, grows with the phase; golden fruits = reflected cards) ---- */
+  function treeSVG(level, fruits) {
+    var H = [0, 30, 62, 94, 122][level];                         // trunk height
+    var BW = [0, 0, 7, 12, 18][level], TW = [0, 0, 3.500, 6, 8.500][level];
+    // Each phase is framed tightly so the tree always fills the picture, anchored to the ground.
+    var VIEW = ["70 188 100 66", "66 160 108 94", "52 120 136 134", "36 62 168 192", "0 0 240 262"][level];
+    var GROUND = [46, 56, 66, 90, 98][level];
+    var out = ['<svg viewBox="' + VIEW + '" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true">'];
+    var base = 236;
+
+    if (level >= 4) {                                              // light rays behind the great tree
+      out.push('<g class="t-rays">');
+      for (var r = 0; r < 9; r++) {
+        var ang = (-80 + r * 20) * Math.PI / 180;
+        out.push('<line x1="120" y1="86" x2="' + (120 + 118 * Math.cos(ang)).toFixed(1) + '" y2="' + (86 + 118 * Math.sin(ang)).toFixed(1) + '"/>');
+      }
+      out.push("</g>");
+    }
+    out.push('<ellipse class="t-ground" cx="120" cy="' + (base + 2) + '" rx="' + GROUND + '" ry="14"/>');
+
+    var circles = [];
+    if (level === 0) {
+      out.push('<path class="t-mound" d="M92 ' + (base + 2) + ' Q120 ' + (base - 20) + ' 148 ' + (base + 2) + 'Z"/>');
+      out.push('<ellipse class="t-seed" cx="120" cy="' + (base - 9) + '" rx="6" ry="8.500"/>');
+    } else if (level === 1) {
+      out.push('<path class="t-stem" d="M120 ' + (base + 2) + ' Q118 ' + (base - H / 2) + ' 120 ' + (base - H) + '"/>');
+      out.push('<ellipse class="t-leaf" cx="106" cy="' + (base - H + 4) + '" rx="13" ry="6.500" transform="rotate(-28 106 ' + (base - H + 4) + ')"/>');
+      out.push('<ellipse class="t-leaf t-leaf2" cx="134" cy="' + (base - H - 2) + '" rx="13" ry="6.500" transform="rotate(28 134 ' + (base - H - 2) + ')"/>');
+    } else {
+      var top = base - H;
+      out.push('<path class="t-trunk" d="M' + (120 - BW) + ' ' + (base + 2) + ' Q' + (120 - TW * 0.6) + ' ' + (base - H * 0.5) + ' ' + (120 - TW) + ' ' + top +
+               ' L' + (120 + TW) + ' ' + top + ' Q' + (120 + TW * 0.6) + ' ' + (base - H * 0.5) + ' ' + (120 + BW) + ' ' + (base + 2) + 'Z"/>');
+      if (level >= 3) {                                            // two side branches
+        out.push('<path class="t-branch" d="M120 ' + (top + 26) + ' Q96 ' + (top + 12) + ' 84 ' + (top - 2) + '"/>');
+        out.push('<path class="t-branch" d="M120 ' + (top + 34) + ' Q146 ' + (top + 18) + ' 158 ' + (top + 2) + '"/>');
+      }
+      var cy = top - 4;
+      circles = [
+        [[120, cy - 6, 27], [100, cy + 8, 19], [140, cy + 8, 19]],
+        [[120, cy - 16, 42], [86, cy + 6, 29], [154, cy + 6, 29], [120, cy + 8, 32]],
+        [[120, cy - 30, 54], [78, cy - 2, 38], [162, cy - 2, 38], [96, cy - 40, 34], [144, cy - 40, 34], [120, cy + 6, 42]]
+      ][level - 2];
+      circles.forEach(function (c, i) {
+        out.push('<circle class="t-leaf' + (i % 2 ? " t-leaf2" : "") + '" cx="' + c[0] + '" cy="' + c[1] + '" r="' + c[2] + '"/>');
+      });
+      // golden fruits on the canopy, placed with the "golden angle" so they never overlap neatly
+      var n = Math.min(fruits, 30);
+      for (var f = 0; f < n; f++) {
+        var c2 = circles[f % circles.length], a = f * 2.399963, rr = c2[2] * (0.25 + 0.6 * (((f * 37) % 10) / 10));
+        out.push('<circle class="t-fruit" cx="' + (c2[0] + rr * Math.cos(a)).toFixed(1) + '" cy="' + (c2[1] + rr * Math.sin(a)).toFixed(1) + '" r="3.800"/>');
+      }
+    }
+    out.push("</svg>");
+    return out.join("");
+  }
+
+  /* ==========================================================================
+     7. COPY / SAVE / RESET
+     ========================================================================== */
+  function journalText() {
+    var list = state.entries.slice().sort(function (a, b) { return a.ts - b.ts; });
+    var lines = [STR.journalHeading, ""];
+    list.forEach(function (e) {
+      var m = cards[e.card - 1]; if (!m) return;
+      lines.push(fmtDate(e.date) + " · " + A.pad2(m.number) + " " + (m.title || STR.card + " " + m.number));
+      lines.push(e.note || STR.noNote);
+      lines.push("");
+    });
+    return lines.join("\n");
+  }
+
+  function flash(msg) {
+    var box = $("journalMsg");
+    box.textContent = msg;
+    clearTimeout(flash.t);
+    flash.t = setTimeout(function () { box.textContent = ""; }, 3500);
+  }
+
+  function copyAll() {
+    var text = journalText();
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;left:-9999px;top:0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      flash(ok ? STR.copied : STR.copyFail);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { flash(STR.copied); }, fallback);
+    else fallback();
+  }
+
+  function saveFile() {
+    try {
+      var blob = new Blob([journalText()], { type: "text/plain;charset=utf-8" });
+      var url = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = url; a.download = "cor-deo-tagebuch.txt";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    } catch (e) { flash(STR.copyFail); }
+  }
+
+  /** Two-step reset (no pop-up dialogs: browsers block them inside embedded frames). */
+  function resetAll() {
+    var btn = $("resetAll");
+    if (!btn.classList.contains("is-armed")) {
+      btn.classList.add("is-armed"); btn.textContent = STR.resetConfirm;
+      clearTimeout(resetAll.t);
+      resetAll.t = setTimeout(disarm, 4000);
+      return;
+    }
+    disarm();
+    state = emptyState();
+    saveState();
+    $("tree").setAttribute("data-key", "");
+    resetToIdle();
+    renderJourney();
+  }
+  function disarm() { var b = $("resetAll"); b.classList.remove("is-armed"); b.textContent = STR.resetAll; }
+
+  /* The app.js init runs first (its listener was registered earlier), then ours. */
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 
 })();
 
