@@ -647,6 +647,22 @@ html, body {
 .viewer-inner.is-flipped { transform: rotateY(180deg); }
 .viewer-inner .face { border-radius: var(--radius-card); }
 
+/* LARGE VIEW: the picture is always shown whole (object-fit: contain), never cropped,
+   whatever the image's own shape. The frame itself is sized by JS to match the picture,
+   so there are no empty bars either. */
+.viewer-inner .face img { object-fit: contain; }
+
+/* Never let anything in the viewer scroll or spill past the screen edges. */
+.viewer-stage { overflow: hidden; }
+
+/* Short screens (phones held sideways, small embeds): give the card the room the hint would use. */
+@media (max-height: 520px) {
+  .viewer-hint { display: none; }
+  .viewer-bar { padding-block: 6px; padding-top: max(6px, env(safe-area-inset-top)); }
+  .viewer-stage { padding-block: 4px; }
+  .icon-btn, .fit-btn { height: 40px; } .icon-btn { width: 40px; }
+}
+
 .nav-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 46px; height: 46px; border-radius: 50%;
@@ -1556,6 +1572,7 @@ window.COR_DEO_META = {
   var fitMode = false;           // "Fit screen" button state
   var fitNative = false;         // true if WE put the browser into native full screen
   var chromeTimer = 0;
+  var viewerRatio = 0;           // width/height of the picture currently open in the viewer (0 = not known yet)
 
   function viewerFaces() { return $("viewerInner").querySelectorAll(".face"); }
 
@@ -1572,7 +1589,7 @@ window.COR_DEO_META = {
     var w = stage.clientWidth  - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     var h = stage.clientHeight - parseFloat(cs.paddingTop)  - parseFloat(cs.paddingBottom);
     if (w <= 0 || h <= 0) return;
-    var r = currentRatio();
+    var r = viewerRatio || currentRatio();       // the open picture's own shape, else the deck's
     var cw = Math.min(w, h * r);                                      // whichever side runs out first
     card.style.width  = Math.floor(cw) + "px";
     card.style.height = Math.floor(cw / r) + "px";
@@ -1658,6 +1675,18 @@ window.COR_DEO_META = {
     inner.appendChild(f); inner.appendChild(b);
     loadFace(f); loadFace(b);
     if (startAtFront && CFG.startFace === "back") inner.classList.add("is-flipped");
+
+    // Size the frame to THIS picture as soon as its real dimensions are known.
+    viewerRatio = 0;
+    var shown = viewerIndex;
+    [f, b].forEach(function (face) {
+      var im = face.querySelector("img");
+      im.addEventListener("load", function () {
+        if (viewerIndex !== shown || !im.naturalWidth) return;           // user already moved on
+        var isFront = face === f;
+        if (isFront || !viewerRatio) { viewerRatio = im.naturalWidth / im.naturalHeight; fitViewerCard(); }
+      });
+    });
 
     $("viewerTitle").textContent = model.title ? model.number + " · " + model.title : STR.card + " " + model.number;
     var pos = visible.indexOf(viewerIndex);
