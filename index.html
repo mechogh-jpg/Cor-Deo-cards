@@ -402,14 +402,17 @@ html, body {
 .card-item[hidden] { display: none !important; }
 
 .caption {
-  display: flex; justify-content: center; align-items: baseline; gap: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
   margin-top: 10px;
-  font-size: 0.78rem; letter-spacing: 0.06em;
+  font-size: 0.78rem; letter-spacing: 0.04em;
   color: var(--text-muted);
   text-align: center;
 }
 .caption .num { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--gold); letter-spacing: 0.1em; }
-.caption .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 12ch; }
+.caption .name {
+  max-width: 100%; line-height: 1.3; font-size: 0.82rem; color: var(--text);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+}
 
 
 /* ============================================================================
@@ -959,15 +962,72 @@ window.COR_DEO_IMAGES = [
 /* ----------------------------------------------------------------------------
    C) OPTIONAL CARD TITLES & SEARCH KEYWORDS
    ----------------------------------------------------------------------------
-   Because the cards are images, the search box finds cards by NUMBER
-   ("7", "#7", "10-20") out of the box. Add titles/keywords here to make
-   them searchable by words too. The key is the card number (1–60).
-   Cards you don't list simply show "Card N".
+   Titles and keywords for all 60 cards (read from the cards themselves).
+   The key is the card number (1–60). The search box looks at the title and the
+   keywords (German, English and Arabic), and also still finds cards by number
+   ("7", "#7", "10-20"). Edit any line freely; cards without an entry show "Card N".
    ---------------------------------------------------------------------------- */
 window.COR_DEO_META = {
-  // 1:  { title: "Surrender",  keywords: ["trust", "peace", "rest"] },
-  // 2:  { title: "Courage",    keywords: ["fear", "strength"] },
-  // 3:  { title: "Gratitude" },
+  1: { title: "Cor Deo – Gottes Wille für Seine Kinder", keywords: ["titelkarte", "deckblatt", "cover", "herz", "gottes", "wille", "kinder", "title", "card", "غلاف", "قلب", "الله"] },
+  2: { title: "Einleitung", keywords: ["willkommen", "herz", "gottes", "introduction", "intro", "anleitung", "مقدمة"] },
+  3: { title: "Gruppenreise: Cor Deo gemeinsam", keywords: ["gruppendiskussion", "gruppe", "gemeinsam", "beten", "anleitung", "group", "discussion", "مجموعة"] },
+  4: { title: "Gottes führende Hand", keywords: ["führung", "weg", "hand", "vertrauen", "psalm", "32", "guidance", "path", "يد", "الله", "إرشاد"] },
+  5: { title: "Die Kraft von visuellen Darstellungen & Kontrast", keywords: ["gehirn", "lernen", "bilder", "kontrast", "didaktik", "brain", "learning", "visual"] },
+  6: { title: "Das gebrochene Herz – Das lebendige Kaleidoskop", keywords: ["gebrochenes", "herz", "kaleidoskop", "frucht", "gerechtigkeit", "dienst", "vertrauen", "gebet", "erlösung", "broken", "heart"] },
+  7: { title: "Dass niemand verloren gehe", keywords: ["2", "petrus", "3,9", "noah", "jona", "genesis", "erlösung", "rettung", "umkehr", "nineve", "salvation", "خلاص", "نوح", "يونان"] },
+  8: { title: "Du hast eine Bestimmung", keywords: ["jer", "29,11", "jeremia", "pilatus", "pontius", "esther", "bestimmung", "berufung", "hände", "waschen", "purpose", "calling", "دعوة"] },
+  9: { title: "Die Bedeutung, Gottes Willen zu tun", keywords: ["baum", "tor", "weg", "bedeutung", "gottes", "willen", "tun", "tree", "gate", "path", "meaning"] },
+  10: { title: "Für den Eintritt in Sein Reich", keywords: ["sinn", "zweck", "reich", "gottes", "ewiges", "leben", "frieden", "gewissheit", "führung", "erfüllung", "verherrlichen", "purpose", "kingdom"] },
+  11: { title: "Gottes Wille: Deine Fragen (1–4)", keywords: ["fragen", "antworten", "lebenssituation", "erkennen", "fehler", "vergebung", "allgemeiner", "wille", "questions", "answers"] },
+  12: { title: "Gottes Wille: Deine Fragen (5–8)", keywords: ["fragen", "antworten", "treu", "bleiben", "ausharren", "timing", "charakter", "beziehungen", "questions", "answers"] },
+  13: { title: "Gottes Wille: Deine Fragen (9–12)", keywords: ["fragen", "antworten", "alltag", "entscheidungen", "wünsche", "widerspruch", "gehorsam", "frieden", "questions", "answers"] },
+  14: { title: "Gottes Wille: Deine Fragen (13–16)", keywords: ["fragen", "antworten", "endziel", "zweck", "innere", "kämpfe", "zweifel", "jonakomplex", "questions", "answers"] },
+  15: { title: "Lebensphasen in Gottes Willen", keywords: ["reise", "des", "baumes", "phase", "wachstum", "ausharren", "fruchtbarkeit", "formung", "töpfer", "tree", "journey", "stages"] },
+  16: { title: "4 Zugänge zum Willen Gottes", keywords: ["tor", "des", "glaubens", "tor", "der", "beziehung", "johannes", "6,40", "matthäus", "22", "vier", "zugänge", "four", "gates"] },
+  17: { title: "3 Dimensionen des Willens Gottes", keywords: ["5", "mose", "29,29", "offenbarter", "wille", "erkannter", "wille", "verborgener", "wille", "schloss", "kompass", "dimensions", "will", "of", "god"] },
+  18: { title: "Die Wahrheit erkennen", keywords: ["johannes", "7,17", "pharisäer", "beröer", "schrift", "prüfen", "wahrheit", "apostelgeschichte", "17", "truth", "scripture", "الحق"] },
+  19: { title: "Wie Gott führt: Stimme, Engel, Träume", keywords: ["gottes", "stimme", "engel", "visionen", "träume", "gebote", "trost", "eingreifen", "führung", "guidance", "voice", "dreams"] },
+  20: { title: "Gottes Charakter", keywords: ["liebe", "gerechtigkeit", "heiligkeit", "barmherzigkeit", "treue", "geduld", "wahrheit", "character", "attributes", "صفات", "الله"] },
+  21: { title: "Suche Gottes Willen in allem, was du tust", keywords: ["1", "mose", "19", "lot", "lots", "frau", "elisa", "elia", "1", "könige", "19", "sprüche", "3,6", "ruf", "zurückblicken", "calling"] },
+  22: { title: "Richte dein Leben nach dem Willen Gottes aus", keywords: ["epheser", "5,17", "isebel", "jesebel", "esther", "1", "könige", "16", "begierden", "will", "of", "god"] },
+  23: { title: "Im Gebet Gottes Führung suchen", keywords: ["kolosser", "1,9", "zedekia", "nehemia", "jeremia", "gebet", "führung", "prayer", "guidance", "صلاة", "إرشاد"] },
+  24: { title: "Liebe", keywords: ["johannes", "13,34", "saul", "jonathan", "krone", "freundschaft", "1", "samuel", "18", "love", "محبة"] },
+  25: { title: "Gehorsam", keywords: ["matthäus", "7,21", "adam", "eva", "noah", "1", "mose", "3", "1", "mose", "6", "gehorsam", "ungehorsam", "obedience", "طاعة"] },
+  26: { title: "Heiligung", keywords: ["1", "thessalonicher", "4,3", "simson", "josef", "richter", "16", "1", "mose", "39", "versuchung", "sünde", "fliehen", "sanctification", "temptation", "تقديس"] },
+  27: { title: "Ein heiliges Leben führen", keywords: ["1", "thess", "4,3", "hofni", "pinehas", "samuel", "1", "samuel", "2", "reinheit", "verunreinigung", "holy", "life", "purity", "قداسة"] },
+  28: { title: "Demut", keywords: ["philipper", "2,3", "nebukadnezar", "mose", "daniel", "4", "4", "mose", "12,3", "humility", "تواضع"] },
+  29: { title: "Wandelt im Geist", keywords: ["galater", "5,16", "simon", "der", "zauberer", "barnabas", "apostelgeschichte", "8", "apostelgeschichte", "11", "geist", "walk", "in", "the", "spirit", "السلوك", "بالروح"] },
+  30: { title: "Viel Frucht bringen", keywords: ["johannes", "15,8", "feigenbaum", "philippus", "evangelist", "lukas", "13", "apostelgeschichte", "8", "frucht", "fruit", "ثمر"] },
+  31: { title: "Viel Frucht bringen", keywords: ["johannes", "15,8", "feigenbaum", "philippus", "evangelist", "lukas", "13", "apostelgeschichte", "8", "frucht", "fruit", "ثمر"] },
+  32: { title: "Täglich anderen dienen", keywords: ["galater", "5,13", "barmherziger", "samariter", "priester", "levit", "jesus", "fußwaschung", "johannes", "13", "lukas", "10", "dienst", "serving", "خدمة"] },
+  33: { title: "Jüngerschaft & Evangelisation", keywords: ["matthäus", "28,19", "missionsbefehl", "jona", "jesaja", "berufung", "evangelism", "discipleship", "تلمذة", "كرازة"] },
+  34: { title: "Treue im Dienst", keywords: ["1", "korinther", "4,2", "salomo", "daniel", "löwengrube", "1", "könige", "11", "daniel", "6", "faithfulness", "أمانة"] },
+  35: { title: "Gerechtigkeit", keywords: ["micha", "6,8", "ahab", "david", "1", "könige", "21", "2", "samuel", "12", "psalm", "51", "zurechtweisung", "justice", "عدل"] },
+  36: { title: "Barmherzigkeit", keywords: ["micha", "6,8", "lukas", "15", "verlorener", "sohn", "älterer", "sohn", "vater", "schwein", "mercy", "prodigal", "رحمة"] },
+  37: { title: "Vergebung", keywords: ["matthäus", "6,14", "matthäus", "18", "unbarmherziger", "knecht", "stephanus", "apostelgeschichte", "7", "forgiveness", "غفران"] },
+  38: { title: "Friede mit allen", keywords: ["römer", "12,18", "nabal", "abigajil", "1", "samuel", "25", "frieden", "versöhnung", "peace", "سلام"] },
+  39: { title: "Ein Hirtenherz", keywords: ["psalm", "23", "hesekiel", "34", "johannes", "10", "hirte", "guter", "hirte", "untreue", "hirten", "shepherd", "راعي"] },
+  40: { title: "Einheit", keywords: ["johannes", "17,20", "turmbau", "zu", "babel", "pfingsten", "1", "mose", "11", "apostelgeschichte", "2", "unity", "وحدة"] },
+  41: { title: "Sünde, Zurechtweisung & Umkehr", keywords: ["erkenntnis", "der", "sünde", "zurechtweisung", "konsequenzen", "umkehr", "erneuerung", "scheitern", "zucht", "repentance", "توبة"] },
+  42: { title: "Dem Vorbild Jesu folgen", keywords: ["matthäus", "26,39", "jona", "maria", "lukas", "1,38", "hingabe", "schwer", "fliehen", "vertrauen", "follow", "jesus", "اتباع", "يسوع"] },
+  43: { title: "Leiden um Christi willen", keywords: ["1", "petrus", "3,17", "zedekia", "jeremia", "jeremia", "38", "wahrheit", "herausfordert", "suffering", "آلام"] },
+  44: { title: "Der Souveränität unterwerfen", keywords: ["jakobus", "4,15", "pharao", "mose", "exodus", "widerstand", "gehorsam", "souveränität", "sovereignty", "سيادة"] },
+  45: { title: "Dein Wille geschehe", keywords: ["matthäus", "6,10", "petrus", "jesus", "gethsemane", "unterwerfen", "widersetzen", "vaterunser", "thy", "will", "be", "done", "لتكن", "مشيئتك"] },
+  46: { title: "Er formt mich", keywords: ["jesaja", "64,8", "töpfer", "ton", "saul", "josef", "1", "samuel", "13", "1", "mose", "37", "kontrolle", "potter", "clay", "الفخاري"] },
+  47: { title: "Sich Gott hingeben", keywords: ["jesaja", "64,8", "israel", "wüste", "jesus", "versuchung", "matthäus", "4", "2", "mose", "16", "hingabe", "surrender", "تسليم"] },
+  48: { title: "Sich Gott hingeben", keywords: ["israel", "wüste", "jesus", "versuchung", "matthäus", "4", "hingabe", "eigener", "weg", "vertrauen", "surrender", "تسليم"] },
+  49: { title: "Gottes Zeitplan vertrauen", keywords: ["epheser", "1,11", "saul", "david", "1", "samuel", "13", "1", "samuel", "24", "warten", "timing", "zeitplan", "trust", "waiting", "توقيت", "الله"] },
+  50: { title: "Hoffnung", keywords: ["römer", "15,13", "saul", "abraham", "1", "samuel", "28", "römer", "4", "krise", "glauben", "verzweiflung", "hope", "رجاء"] },
+  51: { title: "Dem Willen Gottes folgen", keywords: ["geduldig", "schrittweise", "gottes", "treue", "ehrliche", "zweifel", "führung", "entfaltet", "sich", "patience", "step", "by", "step"] },
+  52: { title: "Werdet verwandelt", keywords: ["römer", "12,2", "saul", "paulus", "1", "samuel", "13", "apostelgeschichte", "9", "menschen", "gefallen", "transformation", "تجديد"] },
+  53: { title: "Laufe mit Ausdauer", keywords: ["hebräer", "12,1", "läufer", "ausdauer", "kampf", "perseverance", "endurance", "صبر"] },
+  54: { title: "Gebet", keywords: ["1", "thessalonicher", "5,17", "lukas", "22", "jünger", "schlafen", "jesus", "betet", "gethsemane", "prayer", "صلاة"] },
+  55: { title: "Freude, Gebet & Dank – allezeit", keywords: ["1", "thessalonicher", "5,16", "israeliten", "wüste", "paulus", "silas", "apostelgeschichte", "16", "freude", "dank", "joy", "thanksgiving", "فرح"] },
+  56: { title: "Dankt in allen Dingen", keywords: ["1", "thessalonicher", "5,18", "israeliten", "wüste", "habakuk", "2", "mose", "16", "dank", "gratitude", "شكر"] },
+  57: { title: "Der kosmische Weber", keywords: ["jesus", "tuch", "erlösung", "weben", "verwandeltes", "leben", "demut", "glaube", "dienst", "evangelisation", "gemeinschaft", "redemption"] },
+  58: { title: "Lebensgeschichten: Josef & Ruth", keywords: ["josef", "ruth", "lebensgeschichte", "1", "mose", "37", "gewobene", "hoffnungen", "helfende", "menschen", "gottes", "bestimmung", "noomi", "boas", "life", "story"] },
+  59: { title: "Bereitet zur ewigen Gemeinschaft", keywords: ["johannes", "14,2", "reicher", "jüngling", "henoch", "matthäus", "19", "hebräer", "11", "ewiges", "leben", "nachfolge", "eternal", "life"] },
+  60: { title: "Wandeln in der Fülle von Gottes Willen", keywords: ["lebensreise", "wegweiser", "hingabe", "barmherzigkeit", "dienst", "gehorsam", "verwandlung", "gemeinschaft", "journey", "path"] },
 };
 
 </script>
