@@ -540,13 +540,28 @@ html, body {
 /* ============================================================================
    8. FULL-SCREEN VIEWER
    ============================================================================ */
+/* STACKING: the viewer must sit above EVERYTHING on the page.
+   1) It is opened with the browser's "top layer" (popover="manual" + showPopover()),
+      which is painted above all other elements regardless of z-index.
+   2) Older browsers without popover fall back to the maximum z-index below.
+   3) It is a direct child of <body>, never inside the scrolling app, so no parent
+      can clip it or create a lower stacking context. */
 .viewer {
-  position: fixed; inset: 0; z-index: 100;
+  position: fixed; inset: 0; z-index: 2147483647;
+  width: 100vw; height: 100vh;          /* fallback */
+  width: 100%;  height: 100dvh;         /* dynamic height: stays correct behind mobile browser bars */
+  max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0;     /* cancel the browser's default popover box */
+  overflow: hidden;
+  color: var(--text);
   display: flex; flex-direction: column;
   background: var(--overlay-bg);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   animation: fade .3s ease;
 }
+.viewer::backdrop { background: transparent; }
+/* While the viewer is open, the page's own toolbar can't show through or compete. */
+.app-scroll.is-locked .toolbar-wrap { visibility: hidden; }
 @keyframes fade { from { opacity: 0; } }
 
 .viewer-bar {
@@ -776,7 +791,7 @@ html, body {
   <!-- ======================================================================
        FULL-SCREEN VIEWER  (double-click / long-press / "expand" button)
        ====================================================================== -->
-  <div class="viewer" id="viewer" role="dialog" aria-modal="true" data-i18n-aria="viewerLabel" aria-label="Card viewer" hidden>
+  <div class="viewer" id="viewer" popover="manual" role="dialog" aria-modal="true" data-i18n-aria="viewerLabel" aria-label="Card viewer" hidden>
 
     <header class="viewer-bar">
       <div class="viewer-title">
@@ -1590,8 +1605,6 @@ window.COR_DEO_META = {
     if (userGesture && document.fullscreenEnabled) {
       if (fitMode && !document.fullscreenElement && viewer.requestFullscreen) {
         viewer.requestFullscreen().then(function () { fitNative = true; }).catch(function () { /* blocked: overlay only */ });
-      } else if (!fitMode && fitNative && document.fullscreenElement) {
-        document.exitFullscreen();
       }
     }
     showChrome();
@@ -1606,6 +1619,14 @@ window.COR_DEO_META = {
 
     renderViewerCard(true);
     viewer.hidden = false;
+    // Put the viewer in the browser's top layer so nothing can cover it (see CSS "STACKING").
+    if (viewer.showPopover) { try { viewer.showPopover(); } catch (e) { /* already open / unsupported */ } }
+
+    // Inside an embed (Google Sites): the host page's header/footer can overlap our frame.
+    // Real full screen is the only way past that, so ask for it whenever the host allows it.
+    if (window.self !== window.top && document.fullscreenEnabled && !document.fullscreenElement && viewer.requestFullscreen) {
+      viewer.requestFullscreen().then(function () { fitNative = true; }).catch(function () { /* host blocked it: overlay only */ });
+    }
     setFit(store.get("cordeo:fit") === "1", false);          // remember the visitor's choice
     fitViewerCard();
     $("app").classList.add("is-locked");
@@ -1618,6 +1639,7 @@ window.COR_DEO_META = {
     viewerIndex = -1;
     clearTimeout(chromeTimer);
     $("viewer").classList.remove("chrome-hidden");
+    if ($("viewer").hidePopover) { try { $("viewer").hidePopover(); } catch (e) { /* not open */ } }
     $("viewer").hidden = true;
     $("app").classList.remove("is-locked");
     document.removeEventListener("keydown", viewerKeys, true);
