@@ -14,7 +14,679 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap">
 
-  <link rel="stylesheet" href="css/styles.css">
+  <style>
+/* ============================================================================
+   COR DEO — STYLESHEET
+   ----------------------------------------------------------------------------
+   Sections
+     1. Design tokens (colors, spacing, type) + light / dark themes
+     2. Base & layout helpers
+     3. Masthead & ornaments
+     4. Buttons, search, toolbar
+     5. Card of the Day (hero)
+     6. Deck grid (responsive)
+     7. The card itself (3D flip, hover, highlight, loading, errors)
+     8. Full-screen viewer
+     9. Footer, notices, empty state
+    10. Embed options (?compact=1, ?bg=transparent)
+    11. Reduced motion
+   ============================================================================ */
+
+
+/* ============================================================================
+   1. DESIGN TOKENS
+   ============================================================================ */
+:root {
+  /* Typography */
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Palette — dark ("midnight & gold") is the default */
+  --bg-0: #060918;
+  --bg-1: #0c1230;
+  --bg-glow: rgba(216, 180, 90, 0.10);
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-strong: rgba(255, 255, 255, 0.09);
+  --line: rgba(216, 180, 90, 0.22);
+  --line-strong: rgba(216, 180, 90, 0.55);
+  --text: #f4edda;
+  --text-muted: #a9a290;
+  --gold: #d8b45a;
+  --gold-bright: #f3d98f;
+  --gold-deep: #9c7a2c;
+  --on-gold: #20170a;
+  --shadow-card: 0 18px 40px -18px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 28px 55px -16px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--line-strong), 0 0 38px -6px rgba(216, 180, 90, 0.45);
+  --placeholder-a: #141a3d;
+  --placeholder-b: #1f2757;
+  --toolbar-bg: rgba(8, 12, 32, 0.78);
+  --overlay-bg: rgba(4, 6, 16, 0.94);
+
+  /* Geometry */
+  --radius-card: 14px;
+  --radius-ui: 12px;
+  --gap: 14px;
+  --gutter: 16px;
+  --col-min: 140px;          /* minimum card width -> 2 columns on phones */
+  --card-ratio: 5 / 7;       /* overwritten by JS ("auto" measures your images) */
+  --ease: cubic-bezier(.22, .8, .24, 1);
+  --flip-time: 0.8s;
+}
+
+/* Light theme ("ivory & gold") */
+:root[data-theme="light"] {
+  --bg-0: #f6f0e1;
+  --bg-1: #fbf7ec;
+  --bg-glow: rgba(176, 138, 52, 0.14);
+  --surface: rgba(60, 40, 10, 0.045);
+  --surface-strong: rgba(60, 40, 10, 0.09);
+  --line: rgba(140, 104, 28, 0.28);
+  --line-strong: rgba(140, 104, 28, 0.65);
+  --text: #2b2433;
+  --text-muted: #6d6551;
+  --gold: #9a7420;
+  --gold-bright: #b8912e;
+  --gold-deep: #6f5214;
+  --on-gold: #fffaf0;
+  --shadow-card: 0 16px 34px -18px rgba(60, 40, 10, 0.45), 0 2px 5px rgba(60, 40, 10, 0.18);
+  --shadow-card-hover: 0 26px 50px -18px rgba(60, 40, 10, 0.5), 0 0 0 1px var(--line-strong), 0 0 30px -8px rgba(154, 116, 32, 0.4);
+  --placeholder-a: #e9e0c9;
+  --placeholder-b: #f3ecd8;
+  --toolbar-bg: rgba(250, 245, 230, 0.85);
+  --overlay-bg: rgba(246, 240, 225, 0.97);
+}
+
+/* Responsive steps (mobile first) */
+@media (min-width: 640px)  { :root { --col-min: 184px; --gap: 18px; --gutter: 24px; } }
+@media (min-width: 1024px) { :root { --col-min: 208px; --gap: 22px; --gutter: 32px; } }
+@media (min-width: 1500px) { :root { --col-min: 224px; } }
+
+
+/* ============================================================================
+   2. BASE & LAYOUT HELPERS
+   ============================================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg-0);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Embed transparency option: index.html?bg=transparent */
+:root[data-bg="transparent"] html,
+:root[data-bg="transparent"] body { background: transparent; }
+
+/* The app is its own scroll container so it behaves identically in an iframe. */
+.app-scroll {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  background:
+    radial-gradient(1100px 520px at 50% -140px, var(--bg-glow), transparent 70%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-0) 55%);
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+:root[data-bg="transparent"] .app-scroll { background: none; }
+.app-scroll.is-locked { overflow: hidden; }
+
+.container {
+  width: 100%;
+  max-width: 1320px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.icon {
+  width: 1.15em; height: 1.15em;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  flex: none;
+}
+
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+[hidden] { display: none !important; }
+
+
+/* ============================================================================
+   3. MASTHEAD & ORNAMENTS
+   ============================================================================ */
+.masthead {
+  text-align: center;
+  padding-top: clamp(28px, 6vw, 64px);
+  padding-bottom: clamp(14px, 3vw, 26px);
+}
+
+.masthead-cross {
+  width: 26px; height: 26px;
+  fill: none; stroke: var(--gold);
+  stroke-width: 1.5; stroke-linecap: round;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 10px rgba(216, 180, 90, 0.55));
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.3rem, 8vw, 4.4rem);
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;       /* optically re-centres wide letter-spacing */
+  line-height: 1.05;
+  /* gold foil text */
+  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 55%, var(--gold-deep) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 40px rgba(216, 180, 90, 0.18);
+}
+
+.tagline {
+  margin: 10px auto 0;
+  max-width: 34rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+  color: var(--text-muted);
+}
+.tagline:empty { display: none; }
+
+.ornament {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin-top: 18px;
+}
+.ornament span {
+  height: 1px; width: min(18vw, 120px);
+  background: linear-gradient(90deg, transparent, var(--line-strong));
+}
+.ornament span:last-child { transform: scaleX(-1); }
+.ornament i {
+  width: 7px; height: 7px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  box-shadow: 0 0 12px rgba(216, 180, 90, 0.7);
+}
+
+
+/* ============================================================================
+   4. BUTTONS, SEARCH, TOOLBAR
+   ============================================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px;                       /* comfortable touch target */
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font: 500 0.92rem/1 var(--font-ui);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--surface);
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s, border-color .25s;
+}
+.btn:active { transform: scale(.97); }
+
+.btn-primary {
+  color: var(--on-gold);
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold) 55%, var(--gold-deep));
+  box-shadow: 0 8px 22px -10px rgba(216, 180, 90, 0.8);
+  font-weight: 600;
+}
+.btn-ghost:hover { border-color: var(--line-strong); background: var(--surface-strong); }
+@media (hover: hover) {
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -10px rgba(216, 180, 90, 0.95); }
+}
+
+/* Sticky toolbar */
+.toolbar-wrap {
+  position: sticky; top: 0; z-index: 20;
+  padding-block: 10px;
+  background: var(--toolbar-bg);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-block: 1px solid var(--line);
+}
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;          /* mobile: search | random  */
+  grid-template-areas: "search random" "density density";
+  gap: 10px;
+  align-items: center;
+}
+.search  { grid-area: search; }
+#randomBtn { grid-area: random; }
+.seg     { grid-area: density; justify-self: center; }
+
+@media (min-width: 720px) {
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: "search random density";
+    gap: 14px;
+  }
+  .seg { justify-self: end; }
+}
+/* Very narrow embeds: hide the label, keep the icon */
+@media (max-width: 400px) { #randomBtn { padding: 0 14px; } #randomBtn span { display: none; } }
+
+.search { position: relative; }
+.search .icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none;
+}
+.search input {
+  width: 100%; min-height: 44px;
+  padding: 0 44px 0 42px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: 400 1rem var(--font-ui);        /* 16px prevents iOS zoom-on-focus */
+  transition: border-color .25s, box-shadow .25s, background .25s;
+}
+.search input::placeholder { color: var(--text-muted); }
+.search input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(216, 180, 90, 0.18); background: var(--surface-strong); }
+.search input::-webkit-search-cancel-button { display: none; }
+.search-clear {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; border: 0; border-radius: 50%;
+  background: transparent; color: var(--text-muted); cursor: pointer;
+  display: grid; place-items: center;
+}
+.search-clear:hover { color: var(--text); background: var(--surface-strong); }
+.search-clear .icon { position: static; transform: none; }
+
+/* Segmented "Standard | Large" control */
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+.seg button {
+  min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--text-muted);
+  font: 500 0.85rem var(--font-ui); cursor: pointer;
+  transition: background .25s, color .25s;
+}
+.seg button[aria-pressed="true"] { background: var(--surface-strong); color: var(--gold-bright); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+
+/* ============================================================================
+   5. CARD OF THE DAY
+   ============================================================================ */
+.hero-wrap { padding-block: clamp(10px, 2vw, 22px) clamp(18px, 3vw, 30px); }
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 22px;
+  padding: clamp(20px, 4vw, 36px);
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(520px 260px at 20% 0%, var(--bg-glow), transparent 70%),
+    var(--surface);
+  box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+}
+.hero-slot { width: min(62vw, 250px); }
+.hero-copy { text-align: center; max-width: 28rem; }
+
+.kicker {
+  margin: 0 0 6px;
+  font: 600 0.74rem var(--font-ui);
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--gold);
+}
+.hero-title {
+  margin: 0;
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.9rem, 5vw, 2.7rem); line-height: 1.1;
+}
+.hero-date { margin: 6px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+.hero-hint { margin: 14px 0 0; color: var(--text-muted); font-family: var(--font-display); font-style: italic; font-size: 1.1rem; }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
+
+@media (min-width: 720px) {
+  .hero { grid-template-columns: auto 1fr; justify-items: start; align-items: center; gap: clamp(28px, 5vw, 56px); }
+  .hero-slot { width: 230px; }
+  .hero-copy { text-align: left; }
+  .hero-actions { justify-content: flex-start; }
+}
+
+
+/* ============================================================================
+   6. DECK GRID
+   ============================================================================ */
+.deck { padding-block: 22px 12px; }
+
+.status {
+  margin: 0 0 16px;
+  font-size: 0.85rem; letter-spacing: 0.04em;
+  color: var(--text-muted); text-align: center;
+  min-height: 1.3em;
+}
+
+.grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  /* As many columns as fit, never narrower than --col-min. */
+  grid-template-columns: repeat(auto-fill, minmax(var(--col-min), 1fr));
+  gap: calc(var(--gap) * 1.5) var(--gap);
+}
+/* "Large" density: bigger cards -> fewer columns */
+.grid[data-density="large"] { grid-template-columns: repeat(auto-fill, minmax(calc(var(--col-min) * 1.55), 1fr)); }
+@media (max-width: 420px) {
+  .grid[data-density="large"] { grid-template-columns: 1fr; padding-inline: 12%; }
+}
+
+.card-item {
+  position: relative;
+  /* NOTE: no `content-visibility` here on purpose — it clips the hover lift and
+     the gold highlight glow. Lazy image loading already keeps the page light. */
+}
+.card-item[hidden] { display: none !important; }
+
+.caption {
+  display: flex; justify-content: center; align-items: baseline; gap: 8px;
+  margin-top: 10px;
+  font-size: 0.78rem; letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-align: center;
+}
+.caption .num { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--gold); letter-spacing: 0.1em; }
+.caption .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 12ch; }
+
+
+/* ============================================================================
+   7. THE CARD  (3D flip)
+   ----------------------------------------------------------------------------
+   .card         outer: perspective, hover lift, focus ring, highlight
+   .card-inner   the element that rotates 180° on flip
+   .face         front / back — both absolutely stacked, backface hidden
+   ============================================================================ */
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--card-ratio);       /* identical size for every card */
+  perspective: 1400px;
+  cursor: pointer;
+  border-radius: var(--radius-card);
+  touch-action: manipulation;            /* no double-tap zoom delay */
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;           /* stops iOS long-press image menu */
+  transition: transform .45s var(--ease), filter .45s;
+  outline-offset: 5px;
+}
+
+.card-inner {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--flip-time) var(--ease);
+  border-radius: inherit;
+  box-shadow: var(--shadow-card);
+  will-change: transform;
+}
+.card.is-flipped .card-inner { transform: rotateY(180deg); }
+
+.face {
+  position: absolute; inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  background: linear-gradient(135deg, var(--placeholder-a), var(--placeholder-b));
+  border: 1px solid var(--line);
+}
+.face-back { transform: rotateY(180deg); }
+
+.face img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: var(--img-fit, cover);
+  opacity: 0;
+  transition: opacity .6s ease;
+  pointer-events: none;                  /* clicks go to the card, not the <img> */
+  -webkit-user-drag: none;
+}
+.face.is-loaded img { opacity: 1; }
+
+/* Shimmer while an image is loading */
+.face:not(.is-loaded):not(.is-error)::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(216, 180, 90, 0.18) 50%, transparent 70%);
+  background-size: 220% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer { from { background-position: 160% 0; } to { background-position: -60% 0; } }
+
+/* Soft diagonal sheen over loaded faces (premium "foil" feel) */
+.face.is-loaded::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,0) 35%, rgba(255,255,255,.14) 50%, rgba(255,255,255,0) 65%);
+  background-size: 250% 100%; background-position: 130% 0;
+  transition: background-position 1s var(--ease);
+}
+
+/* Graceful fallback when an image is missing */
+.face-fallback {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px; text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem; line-height: 1.35;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 14px, rgba(216, 180, 90, 0.05) 14px 15px),
+    linear-gradient(135deg, var(--placeholder-a), var(--placeholder-b));
+}
+.face-fallback svg { width: 30px; height: 30px; fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+.face-fallback .retry {
+  margin-top: 4px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line-strong); background: transparent;
+  color: var(--gold-bright); font: 500 0.74rem var(--font-ui); cursor: pointer;
+  pointer-events: auto;
+}
+.face.is-error .face-fallback { display: flex; }
+.face.is-error img { display: none; }
+
+/* Desktop hover — only on devices that truly hover (never "sticks" on touch) */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover { transform: translateY(-8px) scale(1.025); z-index: 2; }
+  .card:hover .card-inner { box-shadow: var(--shadow-card-hover); }
+  .card:hover .face.is-loaded::after { background-position: -30% 0; }
+}
+.card:active { transform: scale(.985); }
+
+/* Highlight used by "Random Card" and "Find in deck" */
+.card.is-highlight { z-index: 3; animation: pop 1s var(--ease); }
+.card.is-highlight .card-inner {
+  box-shadow: 0 0 0 2px var(--gold-bright), 0 0 46px 6px rgba(243, 217, 143, 0.55), var(--shadow-card);
+  animation: glow 1.5s ease-in-out 3;
+}
+@keyframes pop  { 0% { transform: scale(1); } 35% { transform: scale(1.07); } 100% { transform: scale(1); } }
+@keyframes glow { 50% { box-shadow: 0 0 0 3px var(--gold-bright), 0 0 70px 12px rgba(243, 217, 143, 0.75), var(--shadow-card); } }
+
+/* Small "expand" button (accessible alternative to double-click / long-press) */
+.expand-btn {
+  position: absolute; top: 8px; right: 8px; z-index: 4;
+  width: 34px; height: 34px; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid var(--line-strong);
+  background: rgba(6, 9, 24, 0.62); color: var(--gold-bright);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  cursor: pointer;
+  opacity: 0; transform: scale(.9);
+  transition: opacity .25s, transform .25s var(--ease);
+}
+.card-item:hover .expand-btn,
+.expand-btn:focus-visible { opacity: 1; transform: scale(1); }
+@media (hover: none) { .expand-btn { opacity: .85; transform: none; width: 32px; height: 32px; } }
+
+
+/* ============================================================================
+   8. FULL-SCREEN VIEWER
+   ============================================================================ */
+.viewer {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  background: var(--overlay-bg);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  animation: fade .3s ease;
+}
+@keyframes fade { from { opacity: 0; } }
+
+.viewer-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px var(--gutter);
+  padding-top: max(10px, env(safe-area-inset-top));
+}
+.viewer-title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+.viewer-title strong { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; color: var(--gold-bright); }
+.chip { padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 0.7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
+.viewer-count { font-size: 0.8rem; color: var(--text-muted); }
+.viewer-actions { display: flex; gap: 8px; }
+
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--text); cursor: pointer;
+  transition: background .25s, border-color .25s, transform .25s var(--ease);
+}
+.icon-btn:hover { background: var(--surface-strong); border-color: var(--line-strong); }
+.icon-btn:active { transform: scale(.94); }
+
+.viewer-stage {
+  flex: 1; min-height: 0;
+  position: relative;
+  display: grid; place-items: center;
+  padding: 8px 56px;
+  touch-action: pan-y;
+}
+@media (max-width: 640px) { .viewer-stage { padding-inline: 12px; } }
+
+/* The big card scales to fit BOTH width and height of the free area.
+   JS (fitViewerCard) sets the exact pixel size inline; the rules below are only
+   a fallback for the first paint. */
+.viewer-card {
+  height: 100%; max-height: 100%;
+  max-width: 100%;
+  aspect-ratio: var(--card-ratio);
+  perspective: 1800px;
+  cursor: pointer;
+}
+
+/* ---- "Fit screen" button + mode ------------------------------------------ */
+.fit-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 44px; padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--text); font: 500 0.85rem var(--font-ui); cursor: pointer;
+  transition: background .25s, border-color .25s, color .25s, transform .25s var(--ease);
+}
+.fit-btn:hover { background: var(--surface-strong); border-color: var(--line-strong); }
+.fit-btn:active { transform: scale(.96); }
+.fit-btn[aria-pressed="true"] { color: var(--on-gold); border-color: transparent; background: linear-gradient(135deg, var(--gold-bright), var(--gold)); }
+@media (max-width: 520px) {            /* phones: icon only, same 44px touch target */
+  .fit-btn { width: 44px; padding: 0; justify-content: center; }
+  .fit-btn span { display: none; }
+}
+
+/* Fit mode: the card gets the WHOLE screen. The bar floats over it and fades out;
+   safe-area padding keeps the photo clear of notches and rounded corners. */
+.viewer.is-fit .viewer-bar {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .72), transparent);
+}
+.viewer.is-fit .viewer-stage {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.viewer.is-fit .viewer-hint { display: none; }
+.viewer.is-fit .viewer-inner { border-radius: 10px; box-shadow: none; }
+.viewer.is-fit .viewer-inner .face { border-radius: 10px; }
+.viewer-bar { transition: opacity .35s ease; }
+.viewer.is-fit.chrome-hidden .viewer-bar,
+.viewer.is-fit.chrome-hidden .nav-btn { opacity: 0; pointer-events: none; }
+.viewer-inner {
+  position: relative; width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .9s var(--ease);
+  border-radius: var(--radius-card);
+  box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px var(--line-strong);
+}
+.viewer-inner.is-flipped { transform: rotateY(180deg); }
+.viewer-inner .face { border-radius: var(--radius-card); }
+
+.nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid var(--line); background: var(--surface-strong);
+  color: var(--gold-bright); cursor: pointer; z-index: 2;
+  transition: background .25s, transform .25s var(--ease), opacity .35s ease;
+}
+.nav-btn:hover { background: var(--surface); transform: translateY(-50%) scale(1.08); }
+.nav-prev { left: 8px; } .nav-next { right: 8px; }
+@media (max-width: 640px) { .nav-btn { width: 40px; height: 40px; background: rgba(6, 9, 24, .55); } .nav-prev { left: 4px; } .nav-next { right: 4px; } }
+
+.viewer-hint {
+  margin: 0; padding: 8px var(--gutter) max(14px, env(safe-area-inset-bottom));
+  text-align: center; font-size: 0.78rem; letter-spacing: .05em; color: var(--text-muted);
+}
+
+
+/* ============================================================================
+   9. FOOTER, NOTICES, EMPTY STATE
+   ============================================================================ */
+.footer { text-align: center; padding-block: 40px 56px; color: var(--text-muted); font-size: 0.85rem; letter-spacing: .08em; }
+.footer p { margin: 14px 0 0; }
+
+.notice {
+  margin: 8px 0 0; padding: 12px 16px;
+  border-radius: var(--radius-ui);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.85rem; text-align: center;
+}
+.notice strong { color: var(--gold-bright); }
+
+.empty { text-align: center; padding: 56px 0; color: var(--text-muted); }
+.empty p { font-family: var(--font-display); font-style: italic; font-size: 1.4rem; margin: 0 0 16px; }
+
+
+/* ============================================================================
+   10. EMBED OPTIONS
+   ============================================================================ */
+/* index.html?compact=1 -> hides the big masthead (use if your Site page already has a title) */
+:root[data-compact="1"] .masthead { display: none; }
+:root[data-compact="1"] .hero-wrap { padding-top: 18px; }
+
+
+/* ============================================================================
+   11. REDUCED MOTION  (respects the visitor's system setting)
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  /* Flip still works, it just swaps instantly. */
+}
+
+</style>
 </head>
 
 <body>
@@ -116,6 +788,11 @@
         <button type="button" class="icon-btn" id="viewerFlip" data-i18n-aria="flipCard" aria-label="Flip card">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>
         </button>
+        <!-- Fit to screen: enlarges the card to the biggest size the screen allows -->
+        <button type="button" class="fit-btn" id="viewerFit" aria-pressed="false" data-i18n-aria="fitScreen" aria-label="Fit to screen">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="10" height="16" rx="1.5"/><path d="M3 9V5a2 2 0 0 1 2-2h2M21 9V5a2 2 0 0 0-2-2h-2M3 15v4a2 2 0 0 0 2 2h2M21 15v4a2 2 0 0 1-2 2h-2"/></svg>
+          <span id="viewerFitLabel" data-i18n="fitScreen">Fit screen</span>
+        </button>
         <button type="button" class="icon-btn" id="viewerFs" hidden data-i18n-aria="enterFullscreen" aria-label="Enter full screen">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
         </button>
@@ -146,7 +823,1045 @@
   <p class="sr-only" id="live" aria-live="polite"></p>
 
   <!-- Load order matters: data first, then the app. -->
-  <script src="js/cards-data.js"></script>
-  <script src="js/app.js"></script>
+  <script>
+/* ============================================================================
+   COR DEO — DECK DATA & SETTINGS
+   ----------------------------------------------------------------------------
+   THIS IS THE ONLY FILE YOU NEED TO EDIT.
+
+   Step 1  Paste your 120 image URLs into  window.COR_DEO_IMAGES  (below).
+           Order matters:
+               1st URL  = FRONT of card 1
+               2nd URL  = BACK  of card 1
+               3rd URL  = FRONT of card 2
+               4th URL  = BACK  of card 2
+               ... and so on until the 120th URL (BACK of card 60).
+
+   Step 2  (Optional) Give cards a title / search keywords in  COR_DEO_META.
+
+   Step 3  (Optional) Adjust the look & behaviour in  COR_DEO_CONFIG.
+
+   While COR_DEO_IMAGES is empty the app runs in DEMO MODE and shows 60
+   generated placeholder cards, so you can preview the design right away.
+   ============================================================================ */
+
+
+/* ----------------------------------------------------------------------------
+   A) SETTINGS  (all optional — the defaults already look great)
+   ---------------------------------------------------------------------------- */
+window.COR_DEO_CONFIG = {
+
+  deckTitle: "COR DEO",
+  tagline:   "A card deck for prayer & reflection",
+
+  // "dark" (midnight & gold), "light" (ivory & gold) or "auto" (follows the
+  // visitor's device). Can also be overridden in the page URL: ?theme=light
+  theme: "dark",
+
+  // Language / direction of the interface. Leave "" for the browser default.
+  // Example for Arabic: lang: "ar", dir: "rtl"
+  lang: "",
+  dir:  "",
+
+  // Which image is visible first? "front" (default) or "back".
+  startFace: "front",
+
+  // Card shape. "auto" = measured from your first loaded image.
+  // Or fix it yourself, e.g. "5 / 7" (portrait playing card) or "2 / 3".
+  cardAspectRatio: "auto",
+
+  // "cover"   = every card fills the same frame (tiny edge crop if sizes differ)
+  // "contain" = never crops, may show thin bars if sizes differ
+  imageFit: "cover",
+
+  // "Random Card" also turns the chosen card over to reveal it.
+  randomFlipsCard: true,
+
+  // Press-and-hold time (milliseconds) that opens the full-screen viewer.
+  longPressMs: 550,
+
+
+  /* ---- Alternative to pasting URLs: sequential file names -----------------
+     If your 120 images are uploaded to this project's  images/  folder as
+     1.jpg, 2.jpg ... 120.jpg  then leave COR_DEO_IMAGES empty and use:
+
+         imagePattern: "images/{n}.jpg",   // {n} becomes 1, 2, 3 ... 120
+         imageCount:   120,
+         imagePad:     0,                  // 3 would give 001, 002 ... 120
+
+     -------------------------------------------------------------------------*/
+  imagePattern: "https://mechogh-jpg.github.io/Cor-Deo-cards/COR%20DEO-Karten-{n}.jpg",
+  imageCount:   120,
+  imagePad:     3,
+
+  // Optional prefix added to relative paths in the list below (not to full
+  // https:// URLs). Example: "images/"
+  imageBase: "",
+
+  // Interface texts. Override any of them to translate the app, e.g.
+  // strings: { randomCard: "Zufällige Karte", searchPlaceholder: "Karte suchen…" }
+  strings: {}
+};
+
+
+/* ----------------------------------------------------------------------------
+   B) YOUR IMAGE URLS  ▼▼▼  PASTE THEM HERE  ▼▼▼
+   ----------------------------------------------------------------------------
+   • One URL per line, in quotes, followed by a comma.
+   • Front, back, front, back ... (120 entries = 60 cards).
+   • Accepted: full https:// URLs, relative paths (images/001.jpg), and even
+     Google Drive "share" links (they are converted automatically).
+   • Best reliability: host the images inside this same GitHub repository.
+   ---------------------------------------------------------------------------- */
+window.COR_DEO_IMAGES = [
+
+  // "https://YOUR-USERNAME.github.io/cor-deo/images/001.jpg",   // card 1  — front
+  // "https://YOUR-USERNAME.github.io/cor-deo/images/002.jpg",   // card 1  — back
+  // "https://YOUR-USERNAME.github.io/cor-deo/images/003.jpg",   // card 2  — front
+  // "https://YOUR-USERNAME.github.io/cor-deo/images/004.jpg",   // card 2  — back
+  // ... continue until the 120th image ...
+
+];
+// ▲▲▲ END OF IMAGE LIST ▲▲▲
+
+
+/* ----------------------------------------------------------------------------
+   C) OPTIONAL CARD TITLES & SEARCH KEYWORDS
+   ----------------------------------------------------------------------------
+   Because the cards are images, the search box finds cards by NUMBER
+   ("7", "#7", "10-20") out of the box. Add titles/keywords here to make
+   them searchable by words too. The key is the card number (1–60).
+   Cards you don't list simply show "Card N".
+   ---------------------------------------------------------------------------- */
+window.COR_DEO_META = {
+  // 1:  { title: "Surrender",  keywords: ["trust", "peace", "rest"] },
+  // 2:  { title: "Courage",    keywords: ["fear", "strength"] },
+  // 3:  { title: "Gratitude" },
+};
+
+</script>
+  <script>
+/* ============================================================================
+   COR DEO — APPLICATION LOGIC  (vanilla JavaScript, no dependencies)
+   ----------------------------------------------------------------------------
+   You normally never need to edit this file. Image URLs and settings live in
+   js/cards-data.js.
+
+   Sections
+     1.  Configuration & text strings
+     2.  Small utilities
+     3.  Building the card list from the image array
+     4.  Lazy image loading + missing-image handling
+     5.  Building card DOM (3D flip, click / double-click / long-press)
+     6.  Search
+     7.  Random card
+     8.  Card of the Day
+     9.  Full-screen viewer
+    10.  Density toggle, theme, embed options
+    11.  Start-up
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  /* ==========================================================================
+     1. CONFIGURATION & TEXT STRINGS
+     ========================================================================== */
+  var CFG = Object.assign({
+    deckTitle: "COR DEO", tagline: "", theme: "dark", lang: "", dir: "",
+    startFace: "front", cardAspectRatio: "auto", imageFit: "cover",
+    randomFlipsCard: true, longPressMs: 550,
+    imagePattern: "", imageCount: 120, imagePad: 0, imageBase: "", strings: {}
+  }, window.COR_DEO_CONFIG || {});
+
+  var STR = Object.assign({
+    cardOfTheDay: "Card of the Day",
+    cardOfTheDayHint: "Tap the card to turn it over.",
+    showInDeck: "Find in deck",
+    viewLarge: "View large",
+    searchPlaceholder: "Search by number or title…",
+    searchLabel: "Search cards",
+    clearSearch: "Clear search",
+    randomCard: "Random Card",
+    densityLabel: "Card size",
+    densityStandard: "Standard",
+    densityLarge: "Large",
+    noResults: "No cards match your search.",
+    viewerLabel: "Card viewer",
+    flipCard: "Flip card",
+    enterFullscreen: "Toggle full screen",
+    close: "Close",
+    fitScreen: "Fit screen",
+    exitFit: "Exit fit",
+    previous: "Previous card",
+    next: "Next card",
+    viewerHint: "Tap the card to flip · swipe or use ← → to browse",
+    card: "Card",
+    front: "Front",
+    back: "Back",
+    of: "of",
+    showing: "Showing {n} of {total} cards",
+    allCards: "{total} cards",
+    footer: "{title} · {total} cards",
+    imageUnavailable: "Image unavailable",
+    retry: "Retry",
+    randomAnnounce: "Random card: {name}",
+    openLarge: "Open card {name} full screen",
+    flipAria: "{name}. Press to flip.",
+    demoNotice: "<strong>Preview mode.</strong> Add your image URLs in <code>js/cards-data.js</code> to replace these sample cards.",
+    oddNotice: "<strong>Heads-up:</strong> {n} image URLs were found — cards need pairs (front + back). The last image was ignored.",
+    patternNotice: ""
+  }, CFG.strings || {});
+
+  /** Replace {placeholders} in a string. */
+  function fmt(s, vars) {
+    return String(s).replace(/\{(\w+)\}/g, function (_, k) { return vars && k in vars ? vars[k] : ""; });
+  }
+
+  /* ==========================================================================
+     2. SMALL UTILITIES
+     ========================================================================== */
+  var $ = function (id) { return document.getElementById(id); };
+  var NS = "http://www.w3.org/2000/svg";
+
+  /** localStorage that never throws (private mode / blocked storage in iframes). */
+  var store = {
+    get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+  };
+
+  /** Create an element quickly: el("div", "class a b", {attr: value}). */
+  function el(tag, cls, attrs) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (attrs) for (var k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  function pad2(n) { return n < 10 ? "0" + n : String(n); }
+
+  /** Seeded random generator (mulberry32) — used for the Card of the Day. */
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** Turn Google Drive "share" links into directly embeddable image URLs. */
+  function normalizeUrl(u) {
+    u = String(u || "").trim();
+    if (!u) return "";
+    var m = u.match(/drive\.google\.com\/file\/d\/([\w-]+)/) ||
+            u.match(/drive\.google\.com\/(?:open|uc)\?(?:[^#]*&)?id=([\w-]+)/);
+    if (m) return "https://lh3.googleusercontent.com/d/" + m[1];
+    if (CFG.imageBase && !/^([a-z]+:)?\/\//i.test(u) && u.indexOf("data:") !== 0) return CFG.imageBase + u;
+    return u;
+  }
+
+  /** Lower-case + strip accents so "Gnade" / "gnäde" style searches are forgiving. */
+  function fold(s) {
+    s = String(s || "").toLowerCase();
+    return s.normalize ? s.normalize("NFD").replace(/[̀-ͯ]/g, "") : s;
+  }
+
+  /* ==========================================================================
+     3. BUILDING THE CARD LIST FROM THE IMAGE ARRAY
+     --------------------------------------------------------------------------
+     [front1, back1, front2, back2, ...]  ->  [{front, back, title, ...}, ...]
+     ========================================================================== */
+  var cards = [];           // card models, index 0..N-1
+  var demoMode = false;
+  var noticeHtml = "";
+
+  /** Generated placeholder art (SVG data URIs) so the design can be previewed. */
+  function demoImage(n, isBack) {
+    var W = 500, H = 700, svg;
+    if (!isBack) {
+      svg =
+        '<svg xmlns="' + NS + '" viewBox="0 0 ' + W + " " + H + '">' +
+        '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b2150"/><stop offset="1" stop-color="#0a0e26"/></linearGradient></defs>' +
+        '<rect width="500" height="700" fill="url(#g)"/>' +
+        '<rect x="22" y="22" width="456" height="656" rx="14" fill="none" stroke="#d8b45a" stroke-width="2"/>' +
+        '<rect x="36" y="36" width="428" height="628" rx="8" fill="none" stroke="#d8b45a" stroke-opacity=".4"/>' +
+        '<g stroke="#d8b45a" stroke-width="5" stroke-linecap="round"><path d="M250 150v150M200 195h100"/></g>' +
+        '<text x="250" y="450" text-anchor="middle" font-family="Georgia,serif" font-size="120" fill="#f3d98f">' + n + "</text>" +
+        '<text x="250" y="520" text-anchor="middle" font-family="Georgia,serif" font-size="26" letter-spacing="8" fill="#d8b45a">COR DEO</text>' +
+        "</svg>";
+    } else {
+      svg =
+        '<svg xmlns="' + NS + '" viewBox="0 0 ' + W + " " + H + '">' +
+        '<defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#2a1d3d"/><stop offset="1" stop-color="#0d1030"/></linearGradient></defs>' +
+        '<rect width="500" height="700" fill="url(#g)"/>' +
+        '<rect x="22" y="22" width="456" height="656" rx="14" fill="none" stroke="#d8b45a" stroke-width="2"/>' +
+        '<text x="250" y="130" text-anchor="middle" font-family="Georgia,serif" font-size="22" letter-spacing="6" fill="#d8b45a">REFLECTION ' + n + "</text>" +
+        '<g fill="#e9e1cc" font-family="Georgia,serif" font-style="italic" font-size="30" text-anchor="middle">' +
+        '<text x="250" y="320">“Create in me a clean heart,</text><text x="250" y="365">O God, and renew a</text><text x="250" y="410">steadfast spirit within me.”</text></g>' +
+        '<path d="M170 480h160" stroke="#d8b45a" stroke-opacity=".6"/>' +
+        '<text x="250" y="530" text-anchor="middle" font-family="Georgia,serif" font-size="20" letter-spacing="3" fill="#d8b45a">SAMPLE TEXT</text>' +
+        "</svg>";
+    }
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+
+  function buildCards() {
+    var list = (window.COR_DEO_IMAGES || []).map(normalizeUrl).filter(Boolean);
+
+    // Option B: generate names from a pattern ("images/{n}.jpg")
+    if (!list.length && CFG.imagePattern) {
+      for (var i = 1; i <= CFG.imageCount; i++) {
+        var num = CFG.imagePad ? String(i).padStart(CFG.imagePad, "0") : String(i);
+        list.push(normalizeUrl(CFG.imagePattern.replace("{n}", num)));
+      }
+    }
+
+    // Preview mode when nothing was provided
+    if (!list.length) {
+      demoMode = true;
+      for (var d = 1; d <= 60; d++) { list.push(demoImage(d, false), demoImage(d, true)); }
+      noticeHtml = STR.demoNotice;
+    }
+
+    // Odd count -> last lone image can't make a pair
+    if (list.length % 2 === 1) {
+      noticeHtml = fmt(STR.oddNotice, { n: list.length });
+      list.pop();
+    }
+
+    var meta = window.COR_DEO_META || {};
+    for (var c = 0; c < list.length / 2; c++) {
+      var number = c + 1;
+      var m = meta[number] || {};
+      var title = m.title || "";
+      var name = title ? title : STR.card + " " + number;
+      cards.push({
+        index: c,
+        number: number,
+        front: list[c * 2],
+        back: list[c * 2 + 1],
+        title: title,
+        name: name,
+        // Everything the search box looks at, accent-folded:
+        haystack: fold([STR.card, "card", "no", number, title, (m.keywords || []).join(" ")].join(" "))
+      });
+    }
+  }
+
+  /* ==========================================================================
+     4. LAZY IMAGE LOADING + MISSING-IMAGE HANDLING
+     --------------------------------------------------------------------------
+     Images get their real src only when their card is about to scroll into
+     view (IntersectionObserver). The back image loads shortly after the front
+     so the first flip is instant but the initial page weight stays small.
+     ========================================================================== */
+  var io = null;                     // IntersectionObserver (or null if unsupported)
+  var ratioMeasured = false;
+
+  /** Start loading the image of one face element. */
+  function loadFace(face, isRetry) {
+    if (!face || face.dataset.state === "loading" || face.dataset.state === "done") return;
+    var img = face.querySelector("img");
+    var src = face.dataset.src;
+    if (!img || !src) return;
+
+    face.dataset.state = "loading";
+    face.classList.remove("is-error");
+
+    img.onload = function () {
+      face.dataset.state = "done";
+      face.classList.add("is-loaded");
+      measureRatio(img);
+    };
+    img.onerror = function () {
+      // One automatic retry (cache-busted) — helps with flaky connections.
+      if (!isRetry && src.indexOf("data:") !== 0) {
+        face.dataset.state = "";
+        setTimeout(function () {
+          img.src = src + (src.indexOf("?") > -1 ? "&" : "?") + "r=" + Date.now();
+          face.dataset.state = "loading";
+          img.onerror = function () { markError(face); };
+        }, 1200);
+        return;
+      }
+      markError(face);
+    };
+    img.src = src;
+  }
+
+  function markError(face) {
+    face.dataset.state = "error";
+    face.classList.remove("is-loaded");
+    face.classList.add("is-error");
+  }
+
+  /** "auto" aspect ratio: use the first loaded image so all cards match. */
+  function measureRatio(img) {
+    if (ratioMeasured || CFG.cardAspectRatio !== "auto" || !img.naturalWidth) return;
+    ratioMeasured = true;
+    document.documentElement.style.setProperty("--card-ratio", img.naturalWidth + " / " + img.naturalHeight);
+    if (viewerIndex > -1) fitViewerCard();          // viewer already open: re-size to the real image shape
+  }
+
+  /** Card shape as a number (width / height), read from the --card-ratio setting. */
+  function currentRatio() {
+    var raw = document.documentElement.style.getPropertyValue("--card-ratio") || "5 / 7";
+    var p = raw.split("/");
+    var w = parseFloat(p[0]), h = parseFloat(p[1] || "1");
+    return (w > 0 && h > 0) ? w / h : 5 / 7;
+  }
+
+  /** Load front now, back a moment later. */
+  function loadCardImages(cardEl) {
+    var faces = cardEl.querySelectorAll(".face");
+    loadFace(faces[0]);
+    setTimeout(function () { loadFace(faces[1]); }, 350);
+  }
+
+  function observeCard(cardEl) {
+    if (io) io.observe(cardEl);
+    else loadCardImages(cardEl);               // very old browsers: just load
+  }
+
+  /** The IntersectionObserver must watch the app's scroll container, not the window. */
+  function setupObserver() {
+    if (!("IntersectionObserver" in window)) return;
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { io.unobserve(e.target); loadCardImages(e.target); }
+      });
+    }, { root: $("app"), rootMargin: "600px 0px" });   // start 600px before it appears
+  }
+
+  /* ==========================================================================
+     5. BUILDING CARD DOM
+     ========================================================================== */
+  var gridCards = [];        // [{model, item, card}] for the main grid, by index
+
+  /** One face (front or back) with its <img> and its fallback message. */
+  function buildFace(kind, src, model) {
+    var face = el("div", "face face-" + kind);
+    face.dataset.src = src;
+    var img = el("img", "", { alt: "", decoding: "async", draggable: "false" });
+    img.alt = model.name + " — " + (kind === "front" ? STR.front : STR.back);
+    face.appendChild(img);
+
+    var fb = el("div", "face-fallback");
+    fb.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m21 15-5-5L5 21"/></svg>' +
+      "<div></div><div></div>";
+    fb.children[1].textContent = STR.imageUnavailable + " · " + model.number + " " + (kind === "front" ? STR.front : STR.back).toLowerCase();
+    var retry = el("button", "retry", { type: "button" });
+    retry.textContent = STR.retry;
+    retry.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      face.dataset.state = "";
+      loadFace(face, true);
+    });
+    // The 3rd child holds the retry button
+    fb.removeChild(fb.children[2]);
+    fb.appendChild(retry);
+    face.appendChild(fb);
+    return face;
+  }
+
+  /**
+   * Build one flippable card.
+   * opts.eager  -> load images immediately (hero card)
+   * opts.onOpen -> called when the user double-clicks / long-presses / uses the expand button
+   */
+  function buildCard(model, opts) {
+    opts = opts || {};
+    var card = el("div", "card", { role: "button", tabindex: "0", "aria-pressed": "false" });
+    card.setAttribute("aria-label", fmt(STR.flipAria, { name: model.name }));
+    card.dataset.index = model.index;
+
+    var inner = el("div", "card-inner");
+    var front = buildFace("front", model.front, model);
+    var back = buildFace("back", model.back, model);
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+
+    // Start on the back if configured
+    if (CFG.startFace === "back") setFlipped(card, true);
+
+    /* ---- flip on click / Enter / Space ---- */
+    var suppressClick = false;                  // set after a long-press so it doesn't also flip
+
+    card.addEventListener("click", function () {
+      if (suppressClick) { suppressClick = false; return; }
+      toggleFlip(card);
+    });
+    card.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleFlip(card); }
+    });
+
+    /* ---- double-click -> full-screen viewer ----
+       A double click is click + click (two flips = back to start) + dblclick,
+       so the card ends in its original state and the viewer opens. */
+    card.addEventListener("dblclick", function (e) {
+      e.preventDefault();
+      if (opts.onOpen) opts.onOpen(model.index, isFlipped(card));
+    });
+
+    /* ---- long-press (touch / pen / mouse) -> full-screen viewer ---- */
+    var timer = 0, sx = 0, sy = 0;
+    function cancelPress() { clearTimeout(timer); timer = 0; }
+    card.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      sx = e.clientX; sy = e.clientY;
+      cancelPress();
+      timer = setTimeout(function () {
+        timer = 0;
+        suppressClick = true;                   // swallow the click that follows release
+        if (navigator.vibrate) { try { navigator.vibrate(12); } catch (x) { /* ignore */ } }
+        if (opts.onOpen) opts.onOpen(model.index, isFlipped(card));
+      }, CFG.longPressMs);
+    });
+    card.addEventListener("pointermove", function (e) {
+      if (timer && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) cancelPress();   // user is scrolling
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function (t) { card.addEventListener(t, cancelPress); });
+    // Block the browser's long-press context menu on touch screens
+    card.addEventListener("contextmenu", function (e) { if (window.matchMedia("(pointer: coarse)").matches) e.preventDefault(); });
+
+    // Clicking again after a long-press that didn't produce a click must not stay suppressed
+    card.addEventListener("pointerdown", function () { suppressClick = false; }, true);
+
+    if (opts.eager) { loadFace(front); loadFace(back); }
+    return card;
+  }
+
+  function isFlipped(card) { return card.classList.contains("is-flipped"); }
+  function setFlipped(card, on) {
+    card.classList.toggle("is-flipped", on);
+    card.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  function toggleFlip(card) { setFlipped(card, !isFlipped(card)); }
+
+  /** Build all 60 grid items. */
+  function renderGrid() {
+    var grid = $("grid");
+    var frag = document.createDocumentFragment();
+
+    cards.forEach(function (model) {
+      var li = el("li", "card-item");
+      li.dataset.index = model.index;
+
+      var card = buildCard(model, { onOpen: function (i) { openViewer(i); } });
+
+      var cap = el("div", "caption");
+      var num = el("span", "num"); num.textContent = pad2(model.number);
+      cap.appendChild(num);
+      if (model.title) { var nm = el("span", "name"); nm.textContent = model.title; nm.title = model.title; cap.appendChild(nm); }
+
+      var exp = el("button", "expand-btn", { type: "button" });
+      exp.setAttribute("aria-label", fmt(STR.openLarge, { name: model.name }));
+      exp.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+      exp.addEventListener("click", function (e) { e.stopPropagation(); openViewer(model.index); });
+
+      li.appendChild(card);
+      li.appendChild(exp);
+      li.appendChild(cap);
+      frag.appendChild(li);
+      gridCards.push({ model: model, item: li, card: card });
+      observeCard(card);
+    });
+
+    grid.appendChild(frag);
+  }
+
+  /* ==========================================================================
+     6. SEARCH
+     --------------------------------------------------------------------------
+     Understands:  "7"  "#7"  "card 7"  "10-20"  "3, 8, 12"  and any word that
+     appears in a card's title / keywords (set in COR_DEO_META).
+     ========================================================================== */
+  var visible = [];           // indices currently shown (used by viewer navigation)
+
+  function matcher(query) {
+    var q = fold(query).trim();
+    if (!q) return function () { return true; };
+
+    // number ranges / lists:  "10-20", "3,8,12", "#7", "7"
+    var cleaned = q.replace(/(card|no\.?|nr\.?|#)/g, " ").trim();
+    if (/^[\d\s,\-–]+$/.test(cleaned) && /\d/.test(cleaned)) {
+      var nums = {}, ranges = [];
+      cleaned.split(/[,\s]+/).forEach(function (part) {
+        if (!part) return;
+        var r = part.match(/^(\d+)[-–](\d+)$/);
+        if (r) ranges.push([+r[1], +r[2]]); else if (/^\d+$/.test(part)) nums[+part] = true;
+      });
+      return function (m) {
+        if (nums[m.number]) return true;
+        return ranges.some(function (r) { return m.number >= Math.min(r[0], r[1]) && m.number <= Math.max(r[0], r[1]); });
+      };
+    }
+
+    // free text: every word must appear somewhere in the haystack
+    var words = q.split(/\s+/);
+    return function (m) { return words.every(function (w) { return m.haystack.indexOf(w) > -1; }); };
+  }
+
+  function applySearch() {
+    var input = $("search");
+    var q = input.value;
+    $("searchClear").hidden = !q;
+    var test = matcher(q);
+
+    visible = [];
+    gridCards.forEach(function (g) {
+      var ok = test(g.model);
+      g.item.hidden = !ok;
+      if (ok) visible.push(g.model.index);
+    });
+
+    $("empty").hidden = visible.length > 0;
+    $("grid").hidden = visible.length === 0;
+    updateStatus(q);
+  }
+
+  function updateStatus(q) {
+    var total = cards.length;
+    var text = q ? fmt(STR.showing, { n: visible.length, total: total }) : fmt(STR.allCards, { total: total });
+    $("status").textContent = text;
+    if (q) $("live").textContent = text;
+  }
+
+  function clearSearch() {
+    $("search").value = "";
+    applySearch();
+    $("search").focus({ preventScroll: true });
+  }
+
+  /** Debounce so we don't re-filter on every keystroke burst. */
+  function debounce(fn, ms) { var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); }; }
+
+  /* ==========================================================================
+     7. RANDOM CARD
+     ========================================================================== */
+  var lastRandom = -1;
+
+  /** Scroll a grid card into the middle of the app and pulse it with gold. */
+  function highlight(index, flip) {
+    var g = gridCards[index];
+    if (!g) return;
+    if (g.item.hidden) { $("search").value = ""; applySearch(); }
+
+    var app = $("app");
+    var bar = $("toolbar").offsetHeight;
+    var top = g.item.getBoundingClientRect().top - app.getBoundingClientRect().top + app.scrollTop;
+    app.scrollTo({ top: Math.max(0, top - bar - (app.clientHeight - bar - g.item.offsetHeight) / 2), behavior: "smooth" });
+
+    // Restart the CSS animation even if it's already highlighted
+    g.card.classList.remove("is-highlight");
+    void g.card.offsetWidth;
+    g.card.classList.add("is-highlight");
+    clearTimeout(g.hlTimer);
+    g.hlTimer = setTimeout(function () { g.card.classList.remove("is-highlight"); }, 5000);
+
+    loadCardImages(g.card);
+    if (flip) setTimeout(function () { setFlipped(g.card, CFG.startFace !== "back"); }, 650);   // reveal after the scroll
+  }
+
+  function randomCard() {
+    if (cards.length < 1) return;
+    var pick, tries = 0;
+    do { pick = Math.floor(Math.random() * cards.length); tries++; }
+    while (pick === lastRandom && cards.length > 1 && tries < 10);
+    lastRandom = pick;
+
+    // Reset previously highlighted cards so only ONE is highlighted
+    gridCards.forEach(function (g) { g.card.classList.remove("is-highlight"); });
+    // Turn other cards back so the chosen one stands out
+    if (CFG.randomFlipsCard) gridCards.forEach(function (g, i) { if (i !== pick) setFlipped(g.card, CFG.startFace === "back"); });
+    if (CFG.randomFlipsCard) setFlipped(gridCards[pick].card, CFG.startFace === "back");
+
+    highlight(pick, CFG.randomFlipsCard);
+    $("live").textContent = fmt(STR.randomAnnounce, { name: cards[pick].name });
+  }
+
+  /* ==========================================================================
+     8. CARD OF THE DAY
+     --------------------------------------------------------------------------
+     Same card all day for every visitor in the same time zone. Uses a seeded
+     shuffle per "cycle" of N days, so every card appears once before any
+     card repeats.
+     ========================================================================== */
+  var dayCardIndex = 0;
+
+  function cardOfTheDayIndex(date) {
+    var n = cards.length;
+    if (n < 2) return 0;
+    var dayNumber = Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+    var cycle = Math.floor(dayNumber / n);
+    var pos = ((dayNumber % n) + n) % n;
+
+    var order = [], i;
+    for (i = 0; i < n; i++) order.push(i);
+    var rand = rng(cycle * 2654435761 + 12345);           // Fisher–Yates with a seed
+    for (i = n - 1; i > 0; i--) {
+      var j = Math.floor(rand() * (i + 1));
+      var t = order[i]; order[i] = order[j]; order[j] = t;
+    }
+    return order[pos];
+  }
+
+  function renderHero() {
+    var now = new Date();
+    dayCardIndex = cardOfTheDayIndex(now);
+    var model = cards[dayCardIndex];
+
+    var slot = $("heroSlot");
+    slot.innerHTML = "";
+    slot.appendChild(buildCard(model, { eager: true, onOpen: function (i) { openViewer(i); } }));
+
+    $("heroTitle").textContent = model.title ? model.title : STR.card + " " + model.number;
+    var locale = CFG.lang || undefined;
+    try {
+      $("heroDate").textContent = now.toLocaleDateString(locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    } catch (e) { $("heroDate").textContent = now.toDateString(); }
+
+    $("heroFind").onclick = function () { highlight(dayCardIndex, false); };
+    $("heroOpen").onclick = function () { openViewer(dayCardIndex); };
+  }
+
+  /* ==========================================================================
+     9. FULL-SCREEN VIEWER
+     --------------------------------------------------------------------------
+     An in-page overlay (works inside Google Sites' iframe, where the browser's
+     native Fullscreen API is usually blocked). If the browser DOES allow native
+     fullscreen, an extra button appears.
+     ========================================================================== */
+  var viewerIndex = -1;
+  var lastFocus = null;
+  var fitMode = false;           // "Fit screen" button state
+  var fitNative = false;         // true if WE put the browser into native full screen
+  var chromeTimer = 0;
+
+  function viewerFaces() { return $("viewerInner").querySelectorAll(".face"); }
+
+  /**
+   * Size the big card to the LARGEST size that fits the free area, on every device.
+   * Pure CSS can't do this reliably (a card forced to 100% height gets squeezed or
+   * cropped on a portrait phone), so we measure the stage and keep the exact
+   * width:height ratio of your images. Runs on open, on swipe, on rotate and on resize.
+   */
+  function fitViewerCard() {
+    var stage = $("viewerStage"), card = $("viewerCard");
+    if (!stage || !card || stage.clientWidth === 0) return;          // viewer is hidden
+    var cs = window.getComputedStyle(stage);
+    var w = stage.clientWidth  - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var h = stage.clientHeight - parseFloat(cs.paddingTop)  - parseFloat(cs.paddingBottom);
+    if (w <= 0 || h <= 0) return;
+    var r = currentRatio();
+    var cw = Math.min(w, h * r);                                      // whichever side runs out first
+    card.style.width  = Math.floor(cw) + "px";
+    card.style.height = Math.floor(cw / r) + "px";
+  }
+
+  /** In "fit" mode the top bar and arrows fade out after a moment so the photo is unobstructed. */
+  function showChrome() {
+    var viewer = $("viewer");
+    viewer.classList.remove("chrome-hidden");
+    clearTimeout(chromeTimer);
+    if (fitMode && viewerIndex > -1) {
+      chromeTimer = setTimeout(function () { viewer.classList.add("chrome-hidden"); }, 2800);
+    }
+  }
+
+  /** Turn "Fit screen" on/off. userGesture=true also tries real browser full screen. */
+  function setFit(on, userGesture) {
+    fitMode = !!on;
+    var viewer = $("viewer"), btn = $("viewerFit");
+    viewer.classList.toggle("is-fit", fitMode);
+    btn.setAttribute("aria-pressed", fitMode ? "true" : "false");
+    var label = fitMode ? STR.exitFit : STR.fitScreen;
+    $("viewerFitLabel").textContent = label;
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+    store.set("cordeo:fit", fitMode ? "1" : "0");
+
+    // Where the browser allows it (not iPhone Safari, and only if the embedding page
+    // permits it), go truly full screen. Otherwise the overlay fills the frame.
+    if (userGesture && document.fullscreenEnabled) {
+      if (fitMode && !document.fullscreenElement && viewer.requestFullscreen) {
+        viewer.requestFullscreen().then(function () { fitNative = true; }).catch(function () { /* blocked: overlay only */ });
+      } else if (!fitMode && fitNative && document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+    }
+    showChrome();
+    requestAnimationFrame(fitViewerCard);       // after the layout change has applied
+  }
+
+  function openViewer(index) {
+    if (!cards[index]) return;
+    var viewer = $("viewer");
+    lastFocus = document.activeElement;
+    viewerIndex = index;
+
+    renderViewerCard(true);
+    viewer.hidden = false;
+    setFit(store.get("cordeo:fit") === "1", false);          // remember the visitor's choice
+    fitViewerCard();
+    $("app").classList.add("is-locked");
+    document.addEventListener("keydown", viewerKeys, true);
+    $("viewerClose").focus({ preventScroll: true });
+  }
+
+  function closeViewer() {
+    if (viewerIndex < 0) return;
+    viewerIndex = -1;
+    clearTimeout(chromeTimer);
+    $("viewer").classList.remove("chrome-hidden");
+    $("viewer").hidden = true;
+    $("app").classList.remove("is-locked");
+    document.removeEventListener("keydown", viewerKeys, true);
+    if (document.fullscreenElement && document.exitFullscreen) { try { document.exitFullscreen(); } catch (e) { /* ignore */ } }
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+
+  /** (Re)build the two big faces for the current card. */
+  function renderViewerCard(startAtFront) {
+    var model = cards[viewerIndex];
+    var inner = $("viewerInner");
+    inner.classList.remove("is-flipped");
+    inner.innerHTML = "";
+    var f = buildFace("front", model.front, model);
+    var b = buildFace("back", model.back, model);
+    inner.appendChild(f); inner.appendChild(b);
+    loadFace(f); loadFace(b);
+    if (startAtFront && CFG.startFace === "back") inner.classList.add("is-flipped");
+
+    $("viewerTitle").textContent = model.title ? model.number + " · " + model.title : STR.card + " " + model.number;
+    var pos = visible.indexOf(viewerIndex);
+    var total = visible.length || cards.length;
+    $("viewerCount").textContent = (pos > -1 ? pos + 1 : model.number) + " " + STR.of + " " + total;
+    updateViewerFace();
+
+    // Warm the cache for neighbours so swiping feels instant
+    [-1, 1].forEach(function (d) {
+      var nb = neighbour(d);
+      if (nb > -1 && nb !== viewerIndex) { (new Image()).src = cards[nb].front; (new Image()).src = cards[nb].back; }
+    });
+  }
+
+  function updateViewerFace() {
+    var flipped = $("viewerInner").classList.contains("is-flipped");
+    $("viewerFace").textContent = flipped ? STR.back : STR.front;
+  }
+
+  function flipViewer() {
+    $("viewerInner").classList.toggle("is-flipped");
+    updateViewerFace();
+  }
+
+  /** Previous/next card among the currently visible (search-filtered) cards. */
+  function neighbour(dir) {
+    var list = visible.length ? visible : cards.map(function (c) { return c.index; });
+    var pos = list.indexOf(viewerIndex);
+    if (pos < 0) return viewerIndex;
+    return list[(pos + dir + list.length) % list.length];
+  }
+
+  function stepViewer(dir) {
+    viewerIndex = neighbour(dir);
+    renderViewerCard(true);
+    fitViewerCard();
+  }
+
+  /** Keyboard: Esc, arrows, Space/Enter to flip, F for fullscreen, Tab trap. */
+  function viewerKeys(e) {
+    if (viewerIndex < 0) return;
+    showChrome();
+    switch (e.key) {
+      case "Escape":     e.preventDefault(); closeViewer(); break;
+      case "ArrowLeft":  e.preventDefault(); stepViewer(CFG.dir === "rtl" ? 1 : -1); break;
+      case "ArrowRight": e.preventDefault(); stepViewer(CFG.dir === "rtl" ? -1 : 1); break;
+      case " ":
+      case "Enter":
+        if (document.activeElement && document.activeElement.tagName === "BUTTON") return;   // let buttons work normally
+        e.preventDefault(); flipViewer(); break;
+      case "f": case "F": toggleNativeFullscreen(); break;
+      case "m": case "M": setFit(!fitMode, true); break;
+      case "Tab": trapFocus(e); break;
+    }
+  }
+
+  function trapFocus(e) {
+    var nodes = $("viewer").querySelectorAll("button:not([hidden])");
+    if (!nodes.length) return;
+    var first = nodes[0], last = nodes[nodes.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+
+  function toggleNativeFullscreen() {
+    var v = $("viewer");
+    if (!document.fullscreenEnabled) return;
+    if (document.fullscreenElement) { document.exitFullscreen(); }
+    else if (v.requestFullscreen) { v.requestFullscreen().catch(function () { /* blocked by host page: ignore */ }); }
+  }
+
+  function setupViewer() {
+    $("viewerClose").addEventListener("click", closeViewer);
+    $("viewerFlip").addEventListener("click", flipViewer);
+    $("viewerPrev").addEventListener("click", function () { stepViewer(-1); });
+    $("viewerNext").addEventListener("click", function () { stepViewer(1); });
+    if (document.fullscreenEnabled) {
+      $("viewerFs").hidden = false;
+      $("viewerFs").addEventListener("click", toggleNativeFullscreen);
+    }
+
+    // Tap the card to flip; tap the dark area around it to close.
+    var stage = $("viewerStage");
+    var downX = 0, downY = 0, moved = false;
+
+    stage.addEventListener("pointerdown", function (e) { downX = e.clientX; downY = e.clientY; moved = false; });
+    stage.addEventListener("pointermove", function (e) { if (Math.abs(e.clientX - downX) > 10 || Math.abs(e.clientY - downY) > 10) moved = true; });
+    stage.addEventListener("pointerup", function (e) {
+      var dx = e.clientX - downX, dy = e.clientY - downY;
+      // Horizontal swipe -> previous / next
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        var rtl = CFG.dir === "rtl";
+        stepViewer((dx < 0) !== rtl ? 1 : -1);
+      }
+    });
+    stage.addEventListener("click", function (e) {
+      if (moved) return;                                   // it was a swipe, not a tap
+      if (e.target.closest(".nav-btn") || e.target.closest(".retry")) return;
+      if (e.target.closest("#viewerCard")) flipViewer();
+      else closeViewer();                                  // tapped the backdrop
+    });
+
+    // "Fit screen" button + re-fit whenever the available space changes
+    $("viewerFit").addEventListener("click", function () { setFit(!fitMode, true); });
+    $("viewer").addEventListener("pointerdown", showChrome);
+    $("viewer").addEventListener("pointermove", function () { if (fitMode) showChrome(); });
+
+    function refit() { if (viewerIndex > -1) fitViewerCard(); }
+    window.addEventListener("resize", refit);
+    window.addEventListener("orientationchange", function () { setTimeout(refit, 250); });
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", refit);
+
+    // If the browser leaves native full screen (e.g. Esc), the overlay stays open and re-fits.
+    document.addEventListener("fullscreenchange", function () {
+      if (!document.fullscreenElement) fitNative = false;
+      setTimeout(refit, 150);
+    });
+  }
+
+  /* ==========================================================================
+     10. DENSITY TOGGLE, THEME, EMBED OPTIONS
+     ========================================================================== */
+  function setDensity(mode) {
+    $("grid").dataset.density = mode;
+    document.querySelectorAll("#density button").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.dataset.density === mode ? "true" : "false");
+    });
+    store.set("cordeo:density", mode);
+  }
+
+  function applyTheme(pref) {
+    var root = document.documentElement;
+    function set(t) { root.setAttribute("data-theme", t); }
+    if (pref === "auto") {
+      var mq = window.matchMedia("(prefers-color-scheme: light)");
+      set(mq.matches ? "light" : "dark");
+      if (mq.addEventListener) mq.addEventListener("change", function (e) { set(e.matches ? "light" : "dark"); });
+    } else set(pref === "light" ? "light" : "dark");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", root.getAttribute("data-theme") === "light" ? "#f6f0e1" : "#070a1a");
+  }
+
+  /** Reads ?theme=light|dark|auto  ?compact=1  ?bg=transparent  ?card=12 */
+  function readUrlOptions() {
+    var p;
+    try { p = new URLSearchParams(window.location.search); } catch (e) { return {}; }
+    return { theme: p.get("theme"), compact: p.get("compact"), bg: p.get("bg"), card: p.get("card") };
+  }
+
+  /** Apply texts to elements marked with data-i18n / data-i18n-placeholder / data-i18n-aria. */
+  function applyStrings() {
+    document.querySelectorAll("[data-i18n]").forEach(function (n) { var k = n.getAttribute("data-i18n"); if (STR[k]) n.textContent = STR[k]; });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (n) { var k = n.getAttribute("data-i18n-placeholder"); if (STR[k]) n.setAttribute("placeholder", STR[k]); });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function (n) { var k = n.getAttribute("data-i18n-aria"); if (STR[k]) n.setAttribute("aria-label", STR[k]); });
+  }
+
+  /* ==========================================================================
+     11. START-UP
+     ========================================================================== */
+  function init() {
+    var opts = readUrlOptions();
+    var root = document.documentElement;
+
+    // Language / direction
+    if (CFG.lang) root.setAttribute("lang", CFG.lang);
+    if (CFG.dir) root.setAttribute("dir", CFG.dir);
+
+    // Theme + embed options
+    applyTheme(opts.theme || CFG.theme);
+    if (opts.compact === "1") root.setAttribute("data-compact", "1");
+    if (opts.bg === "transparent") root.setAttribute("data-bg", "transparent");
+
+    // Card shape + image fit
+    if (CFG.cardAspectRatio && CFG.cardAspectRatio !== "auto") root.style.setProperty("--card-ratio", CFG.cardAspectRatio);
+    root.style.setProperty("--img-fit", CFG.imageFit === "contain" ? "contain" : "cover");
+
+    applyStrings();
+    buildCards();
+
+    if (!cards.length) {
+      $("notice").innerHTML = "<strong>No cards found.</strong> Add image URLs to <code>js/cards-data.js</code>.";
+      $("notice").hidden = false;
+      $("hero").hidden = true; $("toolbar").hidden = true;
+      return;
+    }
+
+    // Header texts + page title
+    $("deckTitle").textContent = CFG.deckTitle;
+    $("deckTagline").textContent = CFG.tagline || "";
+    document.title = CFG.deckTitle + (CFG.tagline ? " — " + CFG.tagline : "");
+    $("footerText").textContent = fmt(STR.footer, { title: CFG.deckTitle, total: cards.length });
+    if (noticeHtml) { $("notice").innerHTML = noticeHtml; $("notice").hidden = false; }
+
+    setupObserver();
+    renderGrid();
+    renderHero();
+    setupViewer();
+
+    // Initial state of the filter
+    visible = cards.map(function (c) { return c.index; });
+    updateStatus("");
+
+    // Events
+    var search = $("search");
+    search.addEventListener("input", debounce(applySearch, 120));
+    search.addEventListener("keydown", function (e) { if (e.key === "Escape") clearSearch(); });
+    $("searchClear").addEventListener("click", clearSearch);
+    $("emptyClear").addEventListener("click", clearSearch);
+    $("randomBtn").addEventListener("click", randomCard);
+
+    document.querySelectorAll("#density button").forEach(function (b) {
+      b.addEventListener("click", function () { setDensity(b.dataset.density); });
+    });
+    var saved = store.get("cordeo:density");
+    if (saved === "large" || saved === "standard") setDensity(saved);
+
+    // Deep link: index.html?card=12 opens that card in the viewer
+    var wanted = parseInt(opts.card, 10);
+    if (wanted >= 1 && wanted <= cards.length) openViewer(wanted - 1);
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+
+})();
+
+</script>
 </body>
 </html>
