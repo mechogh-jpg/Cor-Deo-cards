@@ -71,3 +71,29 @@ Combine with `&`, e.g. `…/cor-deo/?compact=1&theme=light`.
 - *A card shows "Image unavailable"*: the URL is wrong, not public, or blocked. Use **Retry**, and test the URL in a browser tab.
 - *Nothing changes after editing*: hard refresh (Ctrl/Cmd + Shift + R). GitHub Pages can take a minute to update.
 - *Odd number of URLs*: the app warns you and ignores the last one.
+
+## App auf dem Handy installieren (PWA)
+
+Neben dem Einbetten in Google Sites kann COR DEO als **App-Symbol** auf dem Startbildschirm installiert werden
+(ohne Adressleiste, ohne langen Link, nach dem ersten Öffnen auch offline).
+
+Dateien (alle im Repository neben `index.html`): `manifest.json`, `sw.js`, `pwa.js`, Ordner `icons/`.
+
+| Gerät | So geht's |
+|---|---|
+| Android (Chrome) | Seite öffnen → Karte „Installieren“ antippen (oder Menü ⋮ → „App installieren“) |
+| iPhone (Safari) | Seite öffnen → Teilen-Symbol → „Zum Home-Bildschirm“ → „Hinzufügen“ |
+
+- Direkt-Link zum Installieren: `https://mechogh-jpg.github.io/Cor-Deo-cards/?install=1` (öffnet die Anleitung sofort).
+- Links aus WhatsApp öffnen auf dem iPhone oft in einem Mini-Browser: dort zuerst „In Safari öffnen“ wählen.
+- Im Google-Sites-Rahmen kann man nicht installieren; dort erscheint der Button „Als App öffnen“, der die App in einem eigenen Tab öffnet.
+- `?pwa=0` blendet die Installations-Karte aus (z. B. für die Einbettung in Google Sites, falls sie dort stören sollte).
+- Neue Version einer Änderung an `sw.js`: in der ersten Zeile `VERSION` erhöhen.
+
+**Nach jedem Neubau** mit `tools/build-single-file.py`:
+
+```
+python3 tools/add-pwa.py dist/index.html
+```
+
+Das ergänzt die PWA-Zeilen in der gebauten Datei (nur wenn sie fehlen). Danach `dist/index.html` als `index.html` hochladen.
