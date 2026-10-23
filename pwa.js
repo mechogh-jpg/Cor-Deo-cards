@@ -33,7 +33,10 @@
       android: ["Tippe oben rechts auf das Menü ⋮.", "Wähle „App installieren“ (oder „Zum Startbildschirm hinzufügen“).", "Bestätige mit „Installieren“."],
       androidWebview: "Du hast den Link in einer anderen App geöffnet (z. B. WhatsApp)? Tippe auf ⋮ und wähle „Im Browser öffnen“ bzw. „In Chrome öffnen“. Danach:",
       other: ["Öffne das Browser-Menü.", "Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“."],
-      done: "COR DEO wurde installiert – das Symbol findest du auf deinem Startbildschirm."
+      done: "COR DEO wurde installiert – das Symbol findest du auf deinem Startbildschirm.",
+      offLoading: "Karten werden für die Offline-Nutzung geladen … ",
+      offDone: "✓ Alle {n} Karten sind jetzt auch ohne Internet verfügbar.",
+      offPartial: "Offline-Karten: {d} von {n} geladen. Bei der nächsten Verbindung wird der Rest nachgeladen."
     },
     en: {
       title: "COR DEO as an app on your phone",
@@ -46,7 +49,10 @@
       android: ["Tap the menu ⋮ at the top right.", "Choose “Install app” (or “Add to Home screen”).", "Confirm with “Install”."],
       androidWebview: "Opened the link inside another app (e.g. WhatsApp)? Tap ⋮ and choose “Open in browser” or “Open in Chrome”. Then:",
       other: ["Open the browser menu.", "Choose “Install app” or “Add to Home screen”."],
-      done: "COR DEO is installed – you will find the icon on your home screen."
+      done: "COR DEO is installed – you will find the icon on your home screen.",
+      offLoading: "Loading cards for offline use … ",
+      offDone: "✓ All {n} cards are now available without internet.",
+      offPartial: "Offline cards: {d} of {n} loaded. The rest will load on the next connection."
     }
   };
   var cfg = window.COR_DEO_CONFIG || {};
@@ -61,6 +67,48 @@
   var isAndroid = /Android/i.test(ua);
   var iosWebview = isIOS && !/Safari\//.test(ua);                       // WhatsApp, Facebook … ohne "Safari/"
   var androidWebview = isAndroid && /; wv\)|FBAN|FBAV|Instagram|Line\//.test(ua);
+
+  /* ---------- 3b. Alle Karten für die Offline-Nutzung vorab laden ----------
+     Nur wenn die App wirklich installiert ist (Start vom Startbildschirm) oder gerade installiert wurde,
+     damit normale Besucher (z. B. im Google-Sites-Rahmen) nicht ~7,6 MB laden.
+     Zum Testen im Browser: ?offline=1 */
+  var offlineStarted = false, offlineEl = null;
+  function offlineLine() {
+    if (offlineEl) return offlineEl;
+    var foot = document.getElementById("footerText");
+    offlineEl = document.createElement("p");
+    offlineEl.className = "mini pwa-offline";
+    offlineEl.setAttribute("role", "status");
+    offlineEl.style.textAlign = "center";
+    if (foot && foot.parentNode) foot.parentNode.insertBefore(offlineEl, foot.nextSibling);
+    else document.body.appendChild(offlineEl);
+    return offlineEl;
+  }
+  function startOffline() {
+    if (offlineStarted || inFrame) return;
+    if (!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) return;
+    var conn = navigator.connection || {};
+    if (conn.saveData && params.get("offline") !== "1") return;            // Datensparmodus respektieren
+    offlineStarted = true;
+    navigator.serviceWorker.addEventListener("message", function (e) {
+      var d = e.data || {};
+      if (d.type === "precache-progress") {
+        offlineLine().textContent = S.offLoading + d.done + "/" + d.total;
+      } else if (d.type === "precache-done") {
+        offlineLine().textContent = d.failed ? S.offPartial.replace("{d}", d.done).replace("{n}", d.total)
+                                             : S.offDone.replace("{n}", d.total);
+      }
+    });
+    navigator.serviceWorker.ready.then(function (reg) {
+      var w = reg.active || navigator.serviceWorker.controller;
+      if (w) setTimeout(function () { w.postMessage({ type: "precache" }); }, 1500);   // erst die Seite, dann die Karten
+    }).catch(function () {});
+  }
+  window.addEventListener("appinstalled", startOffline);
+  if (standalone || params.get("offline") === "1") {
+    if (document.readyState === "complete") startOffline();
+    else window.addEventListener("load", startOffline);
+  }
 
   if (standalone || params.get("pwa") === "0") return;                   // schon installiert / bewusst aus
 
