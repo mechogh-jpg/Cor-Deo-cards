@@ -960,7 +960,14 @@ html, body {
 .gm-verdict.is-right { color: var(--gold-bright); }
 .gm-verdict.is-wrong { color: var(--gm-warn); }
 .gm-explain { color: var(--text-muted); }
-.gm-cardwrap { width: min(46vw, 180px); aspect-ratio: var(--card-ratio); margin: 18px auto 8px; }
+.gm-cards { display: flex; justify-content: center; gap: 12px; margin: 18px auto 8px; }
+.gm-cardwrap { width: min(46vw, 180px); aspect-ratio: var(--card-ratio); margin: 0; }
+.gm-cards.is-multi .gm-cardwrap { width: min(38vw, 158px); }
+.gm-son { margin: 14px 0; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-ui); background: var(--surface); text-align: left; }
+.gm-son-t { margin: 0 0 12px !important; font-family: var(--font-display); font-size: 1.2rem; line-height: 1.35; }
+.gm-son .gm-btn { min-height: 52px; font-size: 1rem; }
+.gm-son-fb { min-height: 1.4em; margin: 10px 0 0 !important; font-size: .88rem; color: var(--gold-bright); }
+.gm-end { margin-top: 18px; }
 .gm-cardwrap .card { height: 100%; }
 .gm-hint { font-size: .78rem; color: var(--text-muted); letter-spacing: .04em; }
 .gm-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
@@ -2946,6 +2953,7 @@ window.COR_DEO_META = {
 
    Daten:  GAME_DATA unten (ein Eintrag je Karte).
      n  = Nummer des VORDERSEITEN-Bildes (COR DEO-Karten-0nn.jpg, immer ungerade)
+     also = weitere Karten mit gleicher Vorderseite, aber eigener Rückseite (werden zusammen gezeigt)
      th = Thema der Karte      w / wr = Warnung (links) + Bibelstelle
      v / vr = Vorbild (rechts) + Bibelstelle      q = Frage auf der Karte
    Entfernen: den ganzen <script>-Block, den Tab "tab-game" und den Abschnitt "view-game" löschen.
@@ -2966,7 +2974,7 @@ window.COR_DEO_META = {
     { n: 53, th: "Ein heiliges Leben führen", w: "Hofni und Pinehas", wr: "1. Samuel 2–4", v: "Samuel", vr: "1. Samuel 1–3", q: "Ist mein Herz rein oder treibt es zur Verunreinigung?" },
     { n: 55, th: "Demut", w: "König Nebukadnezar", wr: "Daniel 4,29–37", v: "Mose", vr: "4. Mose 12,3", q: "Wo brauchst du Demut?" },
     { n: 57, th: "Wandelt im Geist", w: "Simon der Zauberer", wr: "Apostelgeschichte 8", v: "Barnabas", vr: "Apostelgeschichte 11,22–24", q: "Ist meine Gesinnung selbstsüchtig oder vom Geist geleitet?" },
-    { n: 59, th: "Viel Frucht bringen", w: "Der unfruchtbare Feigenbaum", wr: "Lukas 13,6–9", v: "Philippus der Evangelist", vr: "Apostelgeschichte 8", q: "Wie bringe ich Frucht für das Reich Gottes?" },
+    { n: 59, also: [61], th: "Viel Frucht bringen", w: "Der unfruchtbare Feigenbaum", wr: "Lukas 13,6–9", v: "Philippus der Evangelist", vr: "Apostelgeschichte 8", q: "Wie bringe ich Frucht für das Reich Gottes?" },
     { n: 63, th: "Täglich anderen dienen", w: "Der Priester und der Levit", wr: "Lukas 10,30–37", v: "Jesus", vr: "Johannes 13,1–17", q: "Wie kann ich anderen täglich dienen, um das Herz Gottes zu spiegeln?" },
     { n: 65, th: "Jüngerschaft, Evangelisation", w: "Jona", wr: "Jona 1,1–3", v: "Jesaja", vr: "Jesaja 6,8", q: "Bin ich gehorsam gegenüber Gottes Ruf, selbst wenn es schwerfällt?" },
     { n: 67, th: "Treue im Dienst", w: "König Salomo", wr: "1. Könige 11", v: "Daniel", vr: "Daniel 6", q: "Bleibe ich treu wie Daniel oder entferne ich mich wie Salomo?" },
@@ -2980,7 +2988,7 @@ window.COR_DEO_META = {
     { n: 87, th: "Der Souveränität unterwerfen", w: "Pharao", wr: "2. Mose 5,2; 7–12", v: "Mose", vr: "2. Mose 3,4; 3–14", q: "Widerspiegelt meine Haltung gegenüber Gottes Führung eher den Pharao oder Mose?" },
     { n: 89, th: "Dein Wille geschehe", w: "Petrus in Gethsemane", wr: "Matthäus 26,51–54", v: "Jesus in Gethsemane", vr: "Matthäus 26,39.42", q: "Unterwerfe ich mich oder widersetze ich mich dem Willen Gottes?" },
     { n: 91, th: "Er formt mich", w: "König Saul", wr: "1. Samuel 13,8–14", v: "Josef", vr: "1. Mose 37–50", q: "Lasse ich Gott den Töpfer sein oder übernehme ich die Kontrolle?" },
-    { n: 93, th: "Sich Gott hingeben", w: "Das Volk Israel in der Wüste", wr: "2. Mose 16–32", v: "Jesus in der Wüste", vr: "Matthäus 4,1–11", q: "Vertraue ich Gott oder gehe ich meinen eigenen Weg?" },
+    { n: 93, also: [95], th: "Sich Gott hingeben", w: "Das Volk Israel in der Wüste", wr: "2. Mose 16–32", v: "Jesus in der Wüste", vr: "Matthäus 4,1–11", q: "Vertraue ich Gott oder gehe ich meinen eigenen Weg?" },
     { n: 97, th: "Gottes Zeitplan vertrauen", w: "Saul", wr: "1. Samuel 13,8–14", v: "David", vr: "1. Samuel 24", q: "Wenn Gott sich verspätet, handle ich wie Saul oder warte ich wie David?" },
     { n: 99, th: "Hoffnung", w: "König Saul", wr: "1. Samuel 28", v: "Abraham", vr: "Römer 4", q: "In der Krise: Wähle ich Glauben wie Abraham oder Verzweiflung wie Saul?" },
     { n: 103, th: "Werdet verwandelt", w: "König Saul", wr: "1. Samuel 13,15", v: "Paulus", vr: "Apostelgeschichte 9", q: "Lebe ich, um Menschen zu gefallen, oder um Gottes Ruf für mein Leben zu erfüllen?" },
@@ -3005,6 +3013,12 @@ window.COR_DEO_META = {
       right_: "Richtig", wrong_: "Nicht ganz",
       isWarn: "{name} ist hier eine Warnung (links auf der Karte).", isVor: "{name} ist hier ein Vorbild (rechts auf der Karte).",
       hint: "Tippe die Karte, um die Rückseite zu lesen. Gedrückt halten oder doppelt tippen: groß ansehen.",
+      hintMulti: "Diese Vorderseite gibt es zweimal – jede Karte hat eine eigene Rückseite. Tippe sie, um beide zu lesen.",
+      bonus: "Bonus", bonusBtn: "Bonus: Welchem Sohn gleiche ich heute?", bonusTitle: "Der verlorene Sohn und sein Bruder",
+      bonusLead: "Keine Punkte, nur ein ehrlicher Blick. Welcher Sohn spricht in diesen Sätzen?",
+      young: "Jüngerer Sohn", old: "Älterer Sohn", youngW: "jüngere Sohn", oldW: "ältere Sohn", sonYes: "Genau – das ist der {s}.", sonNo: "Eher der {s}.",
+      sonEnd: "Beide Söhne waren dem Vater wichtig, und beide brauchten seine Gnade. Dem Jüngeren lief der Vater entgegen, zum Älteren ging er hinaus. Er sagt ihm: Du bist immer bei mir, und alles, was mein ist, ist dein (Lukas 15,20.28.31).",
+      back: "Zurück zum Ergebnis",
       next: "Weiter", finish: "Ergebnis ansehen",
       result: "Dein Ergebnis", of: "von", newBest: "Neuer Bestwert",
       m10: "Ausgezeichnet. Du kennst die Karten gut.", m8: "Sehr gut.", m5: "Gut gemacht. Schau dir die Karten noch einmal an.", m0: "Ein Anfang. Die Karten helfen dir beim Üben.",
@@ -3022,6 +3036,12 @@ window.COR_DEO_META = {
       right_: "Correct", wrong_: "Not quite",
       isWarn: "{name} is a warning here (left on the card).", isVor: "{name} is a role model here (right on the card).",
       hint: "Tap the card to read the back. Press and hold or double-tap to view large.",
+      hintMulti: "This front exists twice – each card has its own back. Tap them to read both.",
+      bonus: "Bonus", bonusBtn: "Bonus: Which son am I today?", bonusTitle: "The lost son and his brother",
+      bonusLead: "No points, just an honest look. Which son is speaking in these sentences?",
+      young: "Younger son", old: "Older son", youngW: "younger son", oldW: "older son", sonYes: "Exactly – this is the {s}.", sonNo: "Rather the {s}.",
+      sonEnd: "Both sons mattered to the father, and both needed his grace. He ran to meet the younger one and went out to the older one. He tells him: you are always with me, and everything I have is yours (Luke 15:20, 28, 31).",
+      back: "Back to result",
       next: "Next", finish: "See result",
       result: "Your result", of: "of", newBest: "New best",
       m10: "Excellent. You know the cards well.", m8: "Very good.", m5: "Well done. Take another look at the cards.", m0: "A start. The cards will help you practise.",
@@ -3042,10 +3062,14 @@ window.COR_DEO_META = {
 
   /* Karten, deren Vorderseiten-Bild wirklich existiert (Schutz gegen falsche Nummern) */
   function buildPool() {
+    function frontOk(n) { var c = cards[(n - 1) / 2]; return !!(c && c.front && c.front.indexOf(("00" + n).slice(-3)) > -1); }
     pool = GAME_DATA.filter(function (d) {
-      var idx = (d.n - 1) / 2, c = cards[idx];
-      return c && c.front && c.front.indexOf(("00" + d.n).slice(-3)) > -1;
-    }).map(function (d) { d.idx = (d.n - 1) / 2; return d; });
+      return [d.n].concat(d.also || []).every(frontOk);
+    }).map(function (d) {
+      d.idx = (d.n - 1) / 2;
+      d.idxs = [d.n].concat(d.also || []).map(function (n) { return (n - 1) / 2; });
+      return d;
+    });
   }
 
   /* ---------- Startseite ---------- */
@@ -3130,10 +3154,14 @@ window.COR_DEO_META = {
     var expl = f(q.side === "warn" ? T.isWarn : T.isVor, { name: name });
     root.appendChild(mk("p", "gm-explain", expl));
 
-    var wrap = mk("div", "gm-cardwrap");
-    wrap.appendChild(A.buildCard(cards[d.idx], { eager: true, onOpen: function (i) { A.openViewer(i); } }));
-    root.appendChild(wrap);
-    root.appendChild(mk("p", "gm-hint", T.hint));
+    var row = mk("div", "gm-cards" + (d.idxs.length > 1 ? " is-multi" : ""));
+    d.idxs.forEach(function (ix) {
+      var wrap = mk("div", "gm-cardwrap");
+      wrap.appendChild(A.buildCard(cards[ix], { eager: true, onOpen: function (i) { A.openViewer(i); } }));
+      row.appendChild(wrap);
+    });
+    root.appendChild(row);
+    root.appendChild(mk("p", "gm-hint", d.idxs.length > 1 ? T.hintMulti : T.hint));
 
     var pair = mk("div", "gm-pair");
     var l = mk("div", "gm-side is-warn" + (q.side === "warn" ? " is-picked" : "")); l.appendChild(mk("b", "", T.warn)); l.appendChild(mk("strong", "", d.w)); l.appendChild(mk("span", "", d.wr));
@@ -3153,10 +3181,10 @@ window.COR_DEO_META = {
     if (app && tb && app.scrollTop > tb.offsetTop) app.scrollTo({ top: tb.offsetTop, behavior: "auto" });
   }
 
-  function renderResult() {
+  function renderResult(again) {
     clear();
-    var s = G.score, n = G.n, isBest = s > best();
-    if (isBest) A.store.set(BEST_KEY, String(s));
+    var s = G.score, n = G.n, isBest = again === true ? G.newBest : s > best();
+    if (again !== true && isBest) { A.store.set(BEST_KEY, String(s)); G.newBest = true; }
     root.appendChild(mk("p", "kicker", T.result));
     root.appendChild(mk("p", "gm-score", s + " " + T.of + " " + n, { tabindex: "-1", id: "gmHead" }));
     var ratio = s / n;
@@ -3176,11 +3204,67 @@ window.COR_DEO_META = {
       });
       root.appendChild(ul);
     }
+    if (cards[(SON_FRONT - 1) / 2]) {
+      var bb = mk("button", "btn btn-ghost", T.bonusBtn, { type: "button" });
+      bb.style.marginBottom = "16px"; bb.addEventListener("click", renderBonus); root.appendChild(bb);
+    }
     var act = mk("div", "gm-actions");
-    var again = mk("button", "btn btn-primary btn-xl", T.again, { type: "button" }); again.addEventListener("click", function () { startGame(); scrollTop(); });
+    var playBtn = mk("button", "btn btn-primary btn-xl", T.again, { type: "button" }); playBtn.addEventListener("click", function () { startGame(); scrollTop(); });
     var home = mk("button", "btn btn-ghost", T.home, { type: "button" }); home.addEventListener("click", function () { renderIntro(); focusHead(); scrollTop(); });
-    act.appendChild(again); act.appendChild(home); root.appendChild(act);
+    act.appendChild(playBtn); act.appendChild(home); root.appendChild(act);
     live(T.result + ": " + s + " " + T.of + " " + n);
+    focusHead(); scrollTop();
+  }
+
+  /* ---------- Bonus: Karte "Der verlorene Sohn" (Vorderseite 71) – keine Punkte ---------- */
+  var SON_FRONT = 71;
+  var SONS = [
+    { s: "young", ref: "Lukas 15,13–20", de: "Ich habe mich von Gott entfernt und vieles verschleudert. Jetzt will ich umkehren.", en: "I drifted away from God and wasted a lot. Now I want to turn back." },
+    { s: "old", ref: "Lukas 15,28–30", de: "Ich diene treu und gehorsam – aber es ärgert mich, wenn Gott Menschen annimmt, die es „nicht verdient“ haben.", en: "I serve faithfully and obediently – but it annoys me when God welcomes people who “don’t deserve it”." },
+    { s: "young", ref: "Lukas 15,18–19", de: "Ich merke, dass ich am Ende bin, und sage: Ich bin es nicht mehr wert, dein Kind zu heißen.", en: "I realise I’m at the end and say: I’m no longer worthy to be called your child." },
+    { s: "old", ref: "Lukas 15,29", de: "Ich vergleiche mich mit anderen und denke: Ich habe doch immer alles richtig gemacht.", en: "I compare myself with others and think: I have always done everything right." }
+  ];
+
+  function renderBonus() {
+    var lang = (A.CFG && A.CFG.uiLang) === "en" ? "en" : "de";
+    var idx = (SON_FRONT - 1) / 2;
+    clear();
+    root.appendChild(mk("p", "kicker", T.bonus));
+    root.appendChild(mk("h2", "", T.bonusTitle, { tabindex: "-1", id: "gmHead" }));
+    root.appendChild(mk("p", "gm-lead", T.bonusLead));
+
+    var done = 0, end = mk("div", "gm-end"); end.hidden = true;
+    SONS.forEach(function (it) {
+      var box = mk("div", "gm-son");
+      box.appendChild(mk("p", "gm-son-t", "„" + it[lang].replace(/^„|“$/g, "") + "“"));
+      var ch = mk("div", "gm-choices", null, { role: "group" });
+      var fb = mk("p", "gm-son-fb", "", { role: "status" });
+      ["young", "old"].forEach(function (kind) {
+        var b = mk("button", "gm-btn is-vor", kind === "young" ? T.young : T.old, { type: "button" });
+        b.addEventListener("click", function () {
+          if (box.dataset.done) return;
+          box.dataset.done = "1"; done++;
+          var who = it.s === "young" ? T.youngW : T.oldW;
+          fb.textContent = f(kind === it.s ? T.sonYes : T.sonNo, { s: who }) + " (" + it.ref + ")";
+          Array.prototype.forEach.call(ch.children, function (x) { x.disabled = true; x.style.opacity = x === b ? "1" : ".55"; });
+          if (done === SONS.length) { end.hidden = false; live(T.sonEnd); }
+        });
+        ch.appendChild(b);
+      });
+      box.appendChild(ch); box.appendChild(fb); root.appendChild(box);
+    });
+
+    if (cards[idx]) {
+      var row = mk("div", "gm-cards"), wrap = mk("div", "gm-cardwrap");
+      wrap.appendChild(A.buildCard(cards[idx], { eager: true, onOpen: function (i) { A.openViewer(i); } }));
+      row.appendChild(wrap); end.appendChild(row);
+      end.appendChild(mk("p", "gm-hint", T.hint));
+    }
+    end.appendChild(mk("p", "gm-q", T.sonEnd));
+    var bk = mk("button", "btn btn-primary btn-xl", T.back, { type: "button" });
+    bk.addEventListener("click", function () { renderResult(true); scrollTop(); });
+    end.appendChild(bk);
+    root.appendChild(end);
     focusHead(); scrollTop();
   }
 
