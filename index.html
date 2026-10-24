@@ -754,6 +754,8 @@ html, body {
 .tab:hover { color: var(--text); background: var(--surface); }
 .tab[aria-selected="true"] { color: var(--gold-bright); background: var(--surface-strong); border-color: var(--line-strong); }
 @media (max-width: 420px) { .tab { font-size: .82rem; gap: 5px; padding: 0 6px; } .tab .icon { width: 1.05em; height: 1.05em; } }
+.tab span { white-space: nowrap; }
+@media (max-width: 440px) { .tab .icon { display: none; } .tab { padding: 0 4px; } }
 
 .btn:disabled { opacity: .55; cursor: default; transform: none; }
 .btn-xl { min-height: 58px; padding: 0 34px; font-size: 1.08rem; }
@@ -911,6 +913,69 @@ html, body {
 .entry-del { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--text-muted); cursor: pointer; }
 .entry-del:hover { background: var(--surface-strong); color: var(--text); }
 
+
+/* ---- GAME: "Vorbild oder Warnung?" ------------------------------------------ */
+.game {
+  --gm-warn: #f0b4b4; --gm-warn-bg: rgba(168, 64, 74, .20); --gm-warn-line: rgba(224, 120, 130, .60);
+  --gm-ok: var(--gold-bright);
+  max-width: 640px; padding-block: 26px 40px; text-align: center;
+}
+:root[data-theme="light"] .game { --gm-warn: #8f2f3a; --gm-warn-bg: rgba(168, 64, 74, .12); --gm-warn-line: rgba(168, 64, 74, .55); }
+.game h2 { margin: 4px 0 10px; font-family: var(--font-display); font-weight: 600; line-height: 1.1; font-size: clamp(1.9rem, 6vw, 2.6rem); color: var(--gold-bright); }
+.game p { margin: 0 0 14px; }
+.gm-lead { color: var(--text-muted); font-size: 1.02rem; line-height: 1.55; }
+.gm-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 22px; }
+.gm-side { padding: 14px 10px; border-radius: var(--radius-ui); border: 1px solid var(--line); background: var(--surface); }
+.gm-side b { display: block; font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; }
+.gm-side span { font-size: .8rem; color: var(--text-muted); }
+.gm-side.is-warn { border-color: var(--gm-warn-line); background: var(--gm-warn-bg); }
+.gm-side.is-warn b { color: var(--gm-warn); }
+.gm-side.is-vor { border-color: var(--line-strong); }
+.gm-side.is-vor b { color: var(--gold-bright); }
+.gm-side.is-picked { box-shadow: 0 0 0 2px var(--gold-bright); }
+.gm-best { margin-top: 14px; font-size: .85rem; color: var(--text-muted); letter-spacing: .04em; }
+
+.gm-top { display: flex; justify-content: space-between; align-items: center; font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
+.gm-top b { color: var(--gold-bright); font-weight: 600; }
+.gm-bar { height: 4px; margin: 10px 0 26px; border-radius: 4px; background: var(--surface-strong); overflow: hidden; }
+.gm-bar span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); transition: width .4s var(--ease); }
+.gm-theme { margin: 0 0 6px; font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+.gm-name { margin: 6px 0 4px !important; font-family: var(--font-display); font-weight: 600; font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1.05; color: var(--text); overflow-wrap: anywhere; }
+.gm-ref { font-size: .9rem; color: var(--text-muted); }
+.gm-ask { margin: 22px 0 18px !important; color: var(--text-muted); }
+.gm-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gm-btn {
+  min-height: 84px; padding: 12px 8px; border-radius: 16px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  font: 600 1.15rem var(--font-ui); letter-spacing: .02em; border: 1.5px solid;
+  transition: transform .15s, background .2s, box-shadow .2s;
+}
+.gm-btn small { font: 400 .74rem var(--font-ui); opacity: .8; letter-spacing: .04em; }
+.gm-btn:active { transform: scale(.98); }
+.gm-btn.is-warn { color: var(--gm-warn); background: var(--gm-warn-bg); border-color: var(--gm-warn-line); }
+.gm-btn.is-vor { color: var(--gold-bright); background: var(--surface-strong); border-color: var(--line-strong); }
+.gm-btn:hover { box-shadow: 0 0 0 3px rgba(216, 180, 90, .18); }
+
+.gm-verdict { margin: 0 0 4px !important; font-family: var(--font-display); font-size: clamp(1.9rem, 7vw, 2.5rem); font-weight: 600; }
+.gm-verdict.is-right { color: var(--gold-bright); }
+.gm-verdict.is-wrong { color: var(--gm-warn); }
+.gm-explain { color: var(--text-muted); }
+.gm-cardwrap { width: min(46vw, 180px); aspect-ratio: var(--card-ratio); margin: 18px auto 8px; }
+.gm-cardwrap .card { height: 100%; }
+.gm-hint { font-size: .78rem; color: var(--text-muted); letter-spacing: .04em; }
+.gm-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.gm-pair .gm-side { text-align: center; }
+.gm-pair .gm-side strong { display: block; margin-top: 4px; font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.gm-q { margin: 16px 0 20px !important; font-family: var(--font-display); font-size: 1.3rem; line-height: 1.35; color: var(--gold-bright); }
+.gm-score { font-family: var(--font-display); font-weight: 600; font-size: clamp(3.6rem, 16vw, 5.4rem); line-height: 1; color: var(--gold-bright); margin: 12px 0 4px !important; }
+.gm-missed { list-style: none; margin: 18px 0 22px; padding: 0; text-align: left; display: grid; gap: 8px; }
+.gm-missed li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-ui); background: var(--surface); }
+.gm-missed .gm-m-name { min-width: 0; overflow-wrap: anywhere; }
+.gm-missed .gm-m-name b { display: block; font-weight: 600; }
+.gm-missed .gm-m-name span { font-size: .8rem; color: var(--text-muted); }
+.gm-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.gm-new { color: var(--gold-bright); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) { .gm-bar span, .gm-btn { transition: none; } }
 </style>
 </head>
 
@@ -949,6 +1014,10 @@ html, body {
         <button type="button" role="tab" class="tab" id="tab-library" data-tab="library" aria-selected="false" aria-controls="view-library" tabindex="-1">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.500"/><rect x="14" y="3" width="7" height="7" rx="1.500"/><rect x="3" y="14" width="7" height="7" rx="1.500"/><rect x="14" y="14" width="7" height="7" rx="1.500"/></svg>
           <span data-i18n="tabLibrary">Bibliothek</span>
+        </button>
+        <button type="button" role="tab" class="tab" id="tab-game" data-tab="game" aria-selected="false" aria-controls="view-game" tabindex="-1">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.600 5.400 5.900.8-4.300 4.100 1 5.800L12 16.300 6.800 19.100l1-5.800L3.500 9.200l5.900-.8Z"/></svg>
+          <span data-i18n="tabGame">Spiel</span>
         </button>
       </div>
     </nav>
@@ -1033,6 +1102,12 @@ html, body {
           <button type="button" class="btn btn-primary" id="goDraw" data-i18n="goDraw">Karte ziehen</button>
         </div>
       </div>
+    </section>
+
+    <!-- ======================  VIEW 4: GAME "Vorbild oder Warnung?"  ====================== -->
+    <section class="view" id="view-game" data-view="game" role="tabpanel" aria-labelledby="tab-game" hidden>
+      <div class="container game" id="gameRoot"></div>
+      <p class="sr-only" id="gameLive" role="status" aria-live="polite"></p>
     </section>
 
     <!-- ======================  VIEW 3: LIBRARY (all 60 cards)  ====================== -->
@@ -1392,7 +1467,7 @@ window.COR_DEO_META = {
       randomAnnounce: "Random card: {name}", openLarge: "Open card {name} full screen", flipAria: "{name}. Press to flip.",
       demoNotice: "<strong>Preview mode.</strong> Add your image URLs in <code>js/cards-data.js</code> to replace these sample cards.",
       oddNotice: "<strong>Heads-up:</strong> {n} image URLs were found — cards need pairs (front + back). The last image was ignored.",
-      tabDraw: "Draw", tabJourney: "My Journey", tabLibrary: "Library",
+      tabDraw: "Draw", tabJourney: "My Journey", tabLibrary: "Library", tabGame: "Game",
       drawTitle: "Draw your card", drawLead: "Take a breath. Ask yourself: What does God's heart wish for you today?",
       drawBtn: "Draw your card", localNote: "Saved on this device only.", shuffling: "Shuffling the deck…",
       drawnToday: "Your card for today", tapToFlip: "Tap the card to read its back.",
@@ -1429,7 +1504,7 @@ window.COR_DEO_META = {
       randomAnnounce: "Zufällige Karte: {name}", openLarge: "Karte {name} groß ansehen", flipAria: "{name}. Zum Umdrehen drücken.",
       demoNotice: "<strong>Vorschau-Modus.</strong> Trage deine Bild-Adressen in <code>js/cards-data.js</code> ein, um diese Beispielkarten zu ersetzen.",
       oddNotice: "<strong>Hinweis:</strong> {n} Bild-Adressen gefunden – Karten brauchen Paare (Vorder- und Rückseite). Das letzte Bild wurde ignoriert.",
-      tabDraw: "Ziehen", tabJourney: "Mein Weg", tabLibrary: "Bibliothek",
+      tabDraw: "Ziehen", tabJourney: "Mein Weg", tabLibrary: "Bibliothek", tabGame: "Spiel",
       drawTitle: "Ziehe deine Karte", drawLead: "Atme durch. Frage dich: Was wünscht sich Gottes Herz heute für dich?",
       drawBtn: "Ziehe deine Karte", localNote: "Nur auf diesem Gerät gespeichert.", shuffling: "Die Karten werden gemischt…",
       drawnToday: "Deine Karte für heute", tapToFlip: "Tippe die Karte, um die Rückseite zu lesen.",
@@ -2372,9 +2447,9 @@ window.COR_DEO_META = {
     renderJourney();
   }
 
-  var VIEWS = ["draw", "journey", "library"];
+  var VIEWS = ["draw", "journey", "library", "game"];
 
-  /** Show one of the three views. Also exposed to app.js (Random Card etc. need the Library). */
+  /** Show one of the four views. Also exposed to app.js (Random Card etc. need the Library). */
   function showView(name, scrollUp) {
     if (VIEWS.indexOf(name) < 0) name = "draw";
     VIEWS.forEach(function (v) {
@@ -2860,6 +2935,278 @@ window.COR_DEO_META = {
 
 </script>
   <!-- App-Installation (PWA) -->
+  <script>
+/* ============================================================================
+   COR DEO — SPIEL "VORBILD ODER WARNUNG?"
+   ----------------------------------------------------------------------------
+   Auf vielen Karten stehen zwei Personen/Gruppen nebeneinander:
+   LINKS = Warnung (negatives Beispiel), RECHTS = Vorbild (positives Beispiel).
+   Das Spiel nennt eine Figur und fragt: Vorbild oder Warnung?
+   Danach zeigt es die echte Karte mit der Reflexionsfrage.
+
+   Daten:  GAME_DATA unten (ein Eintrag je Karte).
+     n  = Nummer des VORDERSEITEN-Bildes (COR DEO-Karten-0nn.jpg, immer ungerade)
+     th = Thema der Karte      w / wr = Warnung (links) + Bibelstelle
+     v / vr = Vorbild (rechts) + Bibelstelle      q = Frage auf der Karte
+   Entfernen: den ganzen <script>-Block, den Tab "tab-game" und den Abschnitt "view-game" löschen.
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  var GAME_DATA = [
+    { n: 13, th: "Dass niemand verloren gehe", w: "Die Generation der Sintflut", wr: "1. Mose 6–9", v: "Ninive", vr: "Jona 3", q: "Welchen Teil von mir wartet Gott noch zu erlösen?" },
+    { n: 15, th: "Du hast eine Bestimmung", w: "Pontius Pilatus", wr: "Matthäus 27,24", v: "Esther", vr: "Esther 4,14", q: "Wo bin ich versucht, meine Hände zu waschen, anstatt das zu tun, was Gott fordert?" },
+    { n: 35, th: "Die Wahrheit erkennen", w: "Die Pharisäer", wr: "Johannes 5,39–40", v: "Die Beröer", vr: "Apostelgeschichte 17,11", q: "Prüfe ich alles an der heiligen Schrift, oder folge ich menschlichen Meinungen?" },
+    { n: 41, th: "Suche Gottes Willen in allem, was du tust", w: "Lots Frau", wr: "1. Mose 19,17–26", v: "Elisa", vr: "1. Könige 19,19–21", q: "Wenn Gott ruft, wirst du zurückblicken oder vorwärtsgehen?" },
+    { n: 43, th: "Richte dein Leben nach dem Willen Gottes aus", w: "Jesebel", wr: "1. Könige 16–21", v: "Esther", vr: "Esther 4,13–16", q: "Folge ich Gottes Willen oder meinen eigenen Begierden?" },
+    { n: 45, th: "Im Gebet Gottes Führung suchen", w: "König Zedekia", wr: "Jeremia 37–38", v: "Nehemia", vr: "Nehemia 1,4", q: "Suche und folge ich Gottes Führung wie Nehemia, oder verwerfe ich sie wie Zedekia?" },
+    { n: 47, th: "Liebe", w: "König Saul", wr: "1. Samuel 18,8–9", v: "Jonathan", vr: "1. Samuel 18,1–4", q: "Würde ich meine „Krone“ für Gottes Willen aufgeben?" },
+    { n: 49, th: "Gehorsam", w: "Adam und Eva", wr: "1. Mose 3,17", v: "Noah", vr: "1. Mose 6,22", q: "Was beeinflusst meine Entscheidung, Gott zu gehorchen oder ungehorsam zu sein?" },
+    { n: 51, th: "Heiligung", w: "Simson", wr: "Richter 16", v: "Josef", vr: "1. Mose 39,7–12", q: "In Momenten der Versuchung: Fliehst du vor der Sünde oder treibst du auf sie zu?" },
+    { n: 53, th: "Ein heiliges Leben führen", w: "Hofni und Pinehas", wr: "1. Samuel 2–4", v: "Samuel", vr: "1. Samuel 1–3", q: "Ist mein Herz rein oder treibt es zur Verunreinigung?" },
+    { n: 55, th: "Demut", w: "König Nebukadnezar", wr: "Daniel 4,29–37", v: "Mose", vr: "4. Mose 12,3", q: "Wo brauchst du Demut?" },
+    { n: 57, th: "Wandelt im Geist", w: "Simon der Zauberer", wr: "Apostelgeschichte 8", v: "Barnabas", vr: "Apostelgeschichte 11,22–24", q: "Ist meine Gesinnung selbstsüchtig oder vom Geist geleitet?" },
+    { n: 59, th: "Viel Frucht bringen", w: "Der unfruchtbare Feigenbaum", wr: "Lukas 13,6–9", v: "Philippus der Evangelist", vr: "Apostelgeschichte 8", q: "Wie bringe ich Frucht für das Reich Gottes?" },
+    { n: 63, th: "Täglich anderen dienen", w: "Der Priester und der Levit", wr: "Lukas 10,30–37", v: "Jesus", vr: "Johannes 13,1–17", q: "Wie kann ich anderen täglich dienen, um das Herz Gottes zu spiegeln?" },
+    { n: 65, th: "Jüngerschaft, Evangelisation", w: "Jona", wr: "Jona 1,1–3", v: "Jesaja", vr: "Jesaja 6,8", q: "Bin ich gehorsam gegenüber Gottes Ruf, selbst wenn es schwerfällt?" },
+    { n: 67, th: "Treue im Dienst", w: "König Salomo", wr: "1. Könige 11", v: "Daniel", vr: "Daniel 6", q: "Bleibe ich treu wie Daniel oder entferne ich mich wie Salomo?" },
+    { n: 69, th: "Gerechtigkeit", w: "König Ahab", wr: "1. Könige 21", v: "König David", vr: "2. Samuel 12; Psalm 51", q: "Reagiere ich auf Zurechtweisung wie David oder wie Ahab?" },
+    { n: 73, th: "Vergebung", w: "Der unbarmherzige Knecht", wr: "Matthäus 18,21–35", v: "Stephanus", vr: "Apostelgeschichte 7,60", q: "Wem musst du heute vergeben?" },
+    { n: 75, th: "Friede mit allen", w: "Nabal", wr: "1. Samuel 25,10–11", v: "Abigajil", vr: "1. Samuel 25,28", q: "Bin ich bereit, dem Frieden nachzujagen, selbst wenn ich nicht im Unrecht bin?" },
+    { n: 77, th: "Ein Hirtenherz", w: "Die untreuen Hirten", wr: "Hesekiel 34,1–10", v: "Der treue Hirte (Jesus)", vr: "Johannes 10", q: "Wie kann ich das Herz des guten Hirten widerspiegeln in der Weise, wie ich für andere sorge?" },
+    { n: 79, th: "Einheit", w: "Der Turmbau zu Babel", wr: "1. Mose 11,1–9", v: "Pfingsten", vr: "Apostelgeschichte 2,1–11", q: "Welche Schritte kann ich gehen, um Einheit zu fördern?" },
+    { n: 83, th: "Vorbild Jesu folgen", w: "Jona", wr: "Jona 1,3", v: "Maria", vr: "Lukas 1,38", q: "Wenn Gottes Wille schwer erscheint, fliehst du wie Jona oder vertraust du wie Maria?" },
+    { n: 85, th: "Leiden um Christi willen", w: "König Zedekia", wr: "Jeremia 38,17–19; 39,6–7", v: "Jeremia", vr: "Jeremia 37,15–16; 38,6", q: "Wenn Gottes Wahrheit dich herausfordert, gehorchst du oder weichst du aus?" },
+    { n: 87, th: "Der Souveränität unterwerfen", w: "Pharao", wr: "2. Mose 5,2; 7–12", v: "Mose", vr: "2. Mose 3,4; 3–14", q: "Widerspiegelt meine Haltung gegenüber Gottes Führung eher den Pharao oder Mose?" },
+    { n: 89, th: "Dein Wille geschehe", w: "Petrus in Gethsemane", wr: "Matthäus 26,51–54", v: "Jesus in Gethsemane", vr: "Matthäus 26,39.42", q: "Unterwerfe ich mich oder widersetze ich mich dem Willen Gottes?" },
+    { n: 91, th: "Er formt mich", w: "König Saul", wr: "1. Samuel 13,8–14", v: "Josef", vr: "1. Mose 37–50", q: "Lasse ich Gott den Töpfer sein oder übernehme ich die Kontrolle?" },
+    { n: 93, th: "Sich Gott hingeben", w: "Das Volk Israel in der Wüste", wr: "2. Mose 16–32", v: "Jesus in der Wüste", vr: "Matthäus 4,1–11", q: "Vertraue ich Gott oder gehe ich meinen eigenen Weg?" },
+    { n: 97, th: "Gottes Zeitplan vertrauen", w: "Saul", wr: "1. Samuel 13,8–14", v: "David", vr: "1. Samuel 24", q: "Wenn Gott sich verspätet, handle ich wie Saul oder warte ich wie David?" },
+    { n: 99, th: "Hoffnung", w: "König Saul", wr: "1. Samuel 28", v: "Abraham", vr: "Römer 4", q: "In der Krise: Wähle ich Glauben wie Abraham oder Verzweiflung wie Saul?" },
+    { n: 103, th: "Werdet verwandelt", w: "König Saul", wr: "1. Samuel 13,15", v: "Paulus", vr: "Apostelgeschichte 9", q: "Lebe ich, um Menschen zu gefallen, oder um Gottes Ruf für mein Leben zu erfüllen?" },
+    { n: 107, th: "Gebet", w: "Die schlafenden Jünger", wr: "Lukas 22,45–46", v: "Jesus betet", vr: "Lukas 22,41–44", q: "Bete ich – oder verschlafe ich die entscheidenden Momente meines Lebens?" },
+    { n: 109, th: "Freude, Gebet und Dank – allezeit!", w: "Die Israeliten in der Wüste", wr: "2. Mose 16–17; 4. Mose 11", v: "Paulus und Silas", vr: "Apostelgeschichte 16", q: "Zeigen meine Entscheidungen in schweren Zeiten mein Vertrauen auf Gottes Willen und Plan für mich?" },
+    { n: 111, th: "Dankt in allen Dingen", w: "Die Israeliten in der Wüste", wr: "2. Mose 16,3", v: "Habakuk", vr: "Habakuk 3,17–18", q: "Kann ich heute sagen: „Aber ich will mich freuen“?" },
+    { n: 117, th: "Bereitet zur ewigen Gemeinschaft", w: "Der reiche Jüngling", wr: "Matthäus 19,16–22", v: "Henoch", vr: "1. Mose 5,24; Hebräer 11,5", q: "Was hält mich zurück, Jesus ganz zu folgen und die ewige Gemeinschaft zu ergreifen?" }
+  ];
+
+  var ROUND = 10;
+  var BEST_KEY = "cordeo:game:best";
+
+  var TXT = {
+    de: {
+      title: "Vorbild oder Warnung?",
+      lead: "Auf vielen Karten stehen zwei Personen nebeneinander. Links siehst du die Warnung, rechts das Vorbild. Erkennst du, wer wohin gehört?",
+      left: "Links", right: "Rechts", warn: "Warnung", vor: "Vorbild",
+      warnSub: "daraus lernen wir, was wir meiden", vorSub: "daran orientieren wir uns",
+      start: "Spiel starten", info: "{r} Fragen · {n} Karten", best: "Dein Bestes: {b} von {r}",
+      qOf: "Frage {i} von {r}", points: "Punkte {s}",
+      cardWord: "Karte", ask: "Wird diese Person auf der Karte als Vorbild oder als Warnung gezeigt?",
+      right_: "Richtig", wrong_: "Nicht ganz",
+      isWarn: "{name} ist hier eine Warnung (links auf der Karte).", isVor: "{name} ist hier ein Vorbild (rechts auf der Karte).",
+      hint: "Tippe die Karte, um die Rückseite zu lesen. Gedrückt halten oder doppelt tippen: groß ansehen.",
+      next: "Weiter", finish: "Ergebnis ansehen",
+      result: "Dein Ergebnis", of: "von", newBest: "Neuer Bestwert",
+      m10: "Ausgezeichnet. Du kennst die Karten gut.", m8: "Sehr gut.", m5: "Gut gemacht. Schau dir die Karten noch einmal an.", m0: "Ein Anfang. Die Karten helfen dir beim Üben.",
+      missed: "Hier lohnt sich ein zweiter Blick", viewCard: "Karte ansehen", again: "Noch einmal spielen", home: "Zur Startseite",
+      aria_warn: "Warnung", aria_vor: "Vorbild"
+    },
+    en: {
+      title: "Role model or warning?",
+      lead: "Many cards show two people side by side. The left one is the warning, the right one the role model. Can you tell who belongs where?",
+      left: "Left", right: "Right", warn: "Warning", vor: "Role model",
+      warnSub: "we learn what to avoid", vorSub: "we follow this example",
+      start: "Start game", info: "{r} questions · {n} cards", best: "Your best: {b} of {r}",
+      qOf: "Question {i} of {r}", points: "Score {s}",
+      cardWord: "Card", ask: "Is this person shown as a role model or as a warning on the card?",
+      right_: "Correct", wrong_: "Not quite",
+      isWarn: "{name} is a warning here (left on the card).", isVor: "{name} is a role model here (right on the card).",
+      hint: "Tap the card to read the back. Press and hold or double-tap to view large.",
+      next: "Next", finish: "See result",
+      result: "Your result", of: "of", newBest: "New best",
+      m10: "Excellent. You know the cards well.", m8: "Very good.", m5: "Well done. Take another look at the cards.", m0: "A start. The cards will help you practise.",
+      missed: "Worth a second look", viewCard: "View card", again: "Play again", home: "Back to start",
+      aria_warn: "Warning", aria_vor: "Role model"
+    }
+  };
+
+  var A, STR, cards, T, $ = function (id) { return document.getElementById(id); };
+  var pool = [], root, G = null;
+
+  function f(s, o) { return String(s).replace(/\{(\w+)\}/g, function (m, k) { return o && o[k] != null ? o[k] : m; }); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function best() { var v = parseInt(A.store.get(BEST_KEY), 10); return isFinite(v) ? v : 0; }
+  function live(msg) { var n = $("gameLive"); if (n) n.textContent = msg; }
+  function clear() { while (root.firstChild) root.removeChild(root.firstChild); }
+  function mk(tag, cls, text, attrs) { var n = A.el(tag, cls, attrs); if (text != null) n.textContent = text; return n; }
+
+  /* Karten, deren Vorderseiten-Bild wirklich existiert (Schutz gegen falsche Nummern) */
+  function buildPool() {
+    pool = GAME_DATA.filter(function (d) {
+      var idx = (d.n - 1) / 2, c = cards[idx];
+      return c && c.front && c.front.indexOf(("00" + d.n).slice(-3)) > -1;
+    }).map(function (d) { d.idx = (d.n - 1) / 2; return d; });
+  }
+
+  /* ---------- Startseite ---------- */
+  function renderIntro() {
+    G = null; clear();
+    var h = mk("h2", "", T.title, { tabindex: "-1", id: "gmHead" });
+    root.appendChild(mk("p", "kicker", "COR DEO"));
+    root.appendChild(h);
+    root.appendChild(mk("p", "gm-lead", T.lead));
+
+    var lg = mk("div", "gm-legend");
+    var l = mk("div", "gm-side is-warn"); l.appendChild(mk("b", "", T.left + " = " + T.warn)); l.appendChild(mk("span", "", T.warnSub));
+    var r = mk("div", "gm-side is-vor"); r.appendChild(mk("b", "", T.right + " = " + T.vor)); r.appendChild(mk("span", "", T.vorSub));
+    lg.appendChild(l); lg.appendChild(r); root.appendChild(lg);
+
+    var btn = mk("button", "btn btn-primary btn-xl", T.start, { type: "button" });
+    btn.addEventListener("click", startGame);
+    root.appendChild(btn);
+    root.appendChild(mk("p", "gm-best", f(T.info, { r: Math.min(ROUND, pool.length), n: pool.length }) + (best() ? "  ·  " + f(T.best, { b: best(), r: ROUND }) : "")));
+  }
+
+  /* ---------- Spiel ---------- */
+  function startGame() {
+    var n = Math.min(ROUND, pool.length);
+    var picks = shuffle(pool).slice(0, n);
+    var sides = [];
+    for (var i = 0; i < n; i++) sides.push(i % 2 === 0 ? "warn" : "vor");
+    sides = shuffle(sides);
+    G = { i: 0, score: 0, n: n, qs: picks.map(function (d, k) { return { d: d, side: sides[k] }; }), missed: [], locked: false };
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    clear(); G.locked = false;
+    var q = G.qs[G.i], d = q.d;
+    var name = q.side === "warn" ? d.w : d.v, ref = q.side === "warn" ? d.wr : d.vr;
+
+    var top = mk("div", "gm-top");
+    top.appendChild(mk("span", "", f(T.qOf, { i: G.i + 1, r: G.n })));
+    var sc = mk("b", "", f(T.points, { s: G.score })); top.appendChild(sc);
+    root.appendChild(top);
+    var bar = mk("div", "gm-bar", null, { "aria-hidden": "true" }); var fill = mk("span"); fill.style.width = (G.i / G.n * 100) + "%"; bar.appendChild(fill);
+    root.appendChild(bar);
+    setTimeout(function () { fill.style.width = ((G.i + 1) / G.n * 100) + "%"; }, 30);
+
+    root.appendChild(mk("p", "gm-theme", T.cardWord + " · " + d.th));
+    root.appendChild(mk("h2", "gm-name", name, { tabindex: "-1", id: "gmHead" }));
+    root.appendChild(mk("p", "gm-ref", ref));
+    root.appendChild(mk("p", "gm-ask", T.ask));
+
+    var ch = mk("div", "gm-choices", null, { role: "group", "aria-label": T.ask });
+    var bw = mk("button", "gm-btn is-warn", T.warn, { type: "button" }); bw.appendChild(mk("small", "", "← " + T.left));
+    var bv = mk("button", "gm-btn is-vor", T.vor, { type: "button" }); bv.appendChild(mk("small", "", T.right + " →"));
+    bw.addEventListener("click", function () { answer("warn"); });
+    bv.addEventListener("click", function () { answer("vor"); });
+    ch.appendChild(bw); ch.appendChild(bv); root.appendChild(ch);
+    live(f(T.qOf, { i: G.i + 1, r: G.n }) + ". " + name);
+    focusHead();
+  }
+
+  function focusHead() { var h = $("gmHead"); if (h && h.focus) { try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); } } }
+
+  function answer(side) {
+    if (!G || G.locked) return;
+    G.locked = true;
+    var q = G.qs[G.i], d = q.d, ok = side === q.side;
+    if (ok) G.score++; else G.missed.push(d);
+    renderFeedback(q, ok, side);
+  }
+
+  function renderFeedback(q, ok, picked) {
+    clear();
+    var d = q.d, name = q.side === "warn" ? d.w : d.v, last = G.i === G.n - 1;
+
+    var top = mk("div", "gm-top");
+    top.appendChild(mk("span", "", f(T.qOf, { i: G.i + 1, r: G.n })));
+    top.appendChild(mk("b", "", f(T.points, { s: G.score })));
+    root.appendChild(top);
+    var bar = mk("div", "gm-bar", null, { "aria-hidden": "true" }); var fill = mk("span"); fill.style.width = ((G.i + 1) / G.n * 100) + "%"; bar.appendChild(fill); root.appendChild(bar);
+
+    root.appendChild(mk("h2", "gm-verdict " + (ok ? "is-right" : "is-wrong"), ok ? T.right_ : T.wrong_, { tabindex: "-1", id: "gmHead" }));
+    var expl = f(q.side === "warn" ? T.isWarn : T.isVor, { name: name });
+    root.appendChild(mk("p", "gm-explain", expl));
+
+    var wrap = mk("div", "gm-cardwrap");
+    wrap.appendChild(A.buildCard(cards[d.idx], { eager: true, onOpen: function (i) { A.openViewer(i); } }));
+    root.appendChild(wrap);
+    root.appendChild(mk("p", "gm-hint", T.hint));
+
+    var pair = mk("div", "gm-pair");
+    var l = mk("div", "gm-side is-warn" + (q.side === "warn" ? " is-picked" : "")); l.appendChild(mk("b", "", T.warn)); l.appendChild(mk("strong", "", d.w)); l.appendChild(mk("span", "", d.wr));
+    var r = mk("div", "gm-side is-vor" + (q.side === "vor" ? " is-picked" : "")); r.appendChild(mk("b", "", T.vor)); r.appendChild(mk("strong", "", d.v)); r.appendChild(mk("span", "", d.vr));
+    pair.appendChild(l); pair.appendChild(r); root.appendChild(pair);
+
+    root.appendChild(mk("p", "gm-q", d.q));
+    var nb = mk("button", "btn btn-primary btn-xl", last ? T.finish : T.next, { type: "button" });
+    nb.addEventListener("click", function () { if (last) renderResult(); else { G.i++; renderQuestion(); scrollTop(); } });
+    root.appendChild(nb);
+    live((ok ? T.right_ : T.wrong_) + ". " + expl);
+    focusHead(); scrollTop();
+  }
+
+  function scrollTop() {
+    var app = $("app"), tb = $("tabbar");
+    if (app && tb && app.scrollTop > tb.offsetTop) app.scrollTo({ top: tb.offsetTop, behavior: "auto" });
+  }
+
+  function renderResult() {
+    clear();
+    var s = G.score, n = G.n, isBest = s > best();
+    if (isBest) A.store.set(BEST_KEY, String(s));
+    root.appendChild(mk("p", "kicker", T.result));
+    root.appendChild(mk("p", "gm-score", s + " " + T.of + " " + n, { tabindex: "-1", id: "gmHead" }));
+    var ratio = s / n;
+    var msg = ratio >= 0.95 ? T.m10 : ratio >= 0.75 ? T.m8 : ratio >= 0.5 ? T.m5 : T.m0;
+    root.appendChild(mk("p", "gm-lead", msg));
+    if (isBest && s > 0) root.appendChild(mk("p", "gm-new", T.newBest));
+
+    if (G.missed.length) {
+      root.appendChild(mk("p", "gm-lead", T.missed));
+      var ul = mk("ul", "gm-missed");
+      G.missed.forEach(function (d) {
+        var li = mk("li"), nm = mk("div", "gm-m-name");
+        nm.appendChild(mk("b", "", d.w + "  ·  " + d.v)); nm.appendChild(mk("span", "", T.cardWord + " · " + d.th));
+        var b = mk("button", "btn btn-ghost btn-sm", T.viewCard, { type: "button" });
+        b.addEventListener("click", function () { A.openViewer(d.idx); });
+        li.appendChild(nm); li.appendChild(b); ul.appendChild(li);
+      });
+      root.appendChild(ul);
+    }
+    var act = mk("div", "gm-actions");
+    var again = mk("button", "btn btn-primary btn-xl", T.again, { type: "button" }); again.addEventListener("click", function () { startGame(); scrollTop(); });
+    var home = mk("button", "btn btn-ghost", T.home, { type: "button" }); home.addEventListener("click", function () { renderIntro(); focusHead(); scrollTop(); });
+    act.appendChild(again); act.appendChild(home); root.appendChild(act);
+    live(T.result + ": " + s + " " + T.of + " " + n);
+    focusHead(); scrollTop();
+  }
+
+  /* Tasten: ← Warnung, → Vorbild (nur während einer Frage) */
+  document.addEventListener("keydown", function (e) {
+    if (!G || G.locked || $("view-game").hidden) return;
+    var t = e.target; if (t && (t.tagName === "TEXTAREA" || t.tagName === "INPUT")) return;
+    if (e.key === "ArrowLeft" && t && t.classList && t.classList.contains("tab")) return;
+    if (e.key === "ArrowLeft") { e.preventDefault(); answer("warn"); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); answer("vor"); }
+  });
+
+  function init() {
+    A = window.CorDeoApp; root = $("gameRoot");
+    if (!A || !root) return;
+    cards = A.cards; STR = A.STR;
+    T = TXT[(A.CFG && A.CFG.uiLang) === "en" ? "en" : "de"];
+    buildPool();
+    if (pool.length < 4) { var tab = $("tab-game"); if (tab) tab.hidden = true; return; }      // zu wenige Karten: Tab ausblenden
+    renderIntro();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
   <script src="pwa.js"></script>
 </body>
 </html>
