@@ -586,7 +586,18 @@ html, body {
 .viewer-title strong { font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; color: var(--gold-bright); }
 .chip { padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 0.7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
 .viewer-count { font-size: 0.8rem; color: var(--text-muted); }
-.viewer-actions { display: flex; gap: 8px; }
+.viewer-actions { display: flex; gap: 8px; flex: none; }
+.viewer-title { flex: 1 1 0; }
+@media (max-width: 440px) {
+  .viewer-actions { gap: 5px; }
+  .viewer-actions .icon-btn, .viewer-actions .fit-btn { width: 40px; height: 40px; }
+  .viewer-title strong { font-size: 1.15rem; }
+}
+@media (max-width: 350px) {
+  .viewer-bar { flex-wrap: wrap; row-gap: 6px; }
+  .viewer-title { flex-basis: 100%; }
+  .viewer-actions { margin-inline-start: auto; }
+}
 
 .icon-btn {
   width: 44px; height: 44px; border-radius: 50%;
@@ -1097,6 +1108,19 @@ html, body {
   .wl-heart-fill { transition: none; }
 }
 .credit-line { margin: 10px 0 0; font-size: .78rem; letter-spacing: .04em; font-style: italic; opacity: .85; }
+
+/* ---- Gedanke zur Karte (im Großansicht-Fenster) ------------------------------ */
+.vn-panel {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); z-index: 6;
+  width: min(100%, 600px); max-height: 62%; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg-1); border: 1px solid var(--line-strong); border-bottom: 0; border-radius: 22px 22px 0 0;
+  padding: 18px 20px calc(22px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -18px 50px -10px rgba(0, 0, 0, .7);
+}
+.vn-panel[hidden] { display: none; }
+.vn-title { margin: 0 0 8px; font-family: var(--font-display); font-weight: 600; font-size: 1.7rem; color: var(--gold-bright); }
+.vn-text { margin: 0; font-size: 1rem; line-height: 1.62; color: var(--text); }
+.vn-q { margin: 14px 0 0; font-family: var(--font-display); font-style: italic; font-size: 1.22rem; line-height: 1.45; color: var(--gold-bright); }
+.vn-refs { margin: 12px 0 0; font-size: .85rem; line-height: 1.5; color: var(--text-muted); }
 </style>
 </head>
 
@@ -1322,6 +1346,10 @@ html, body {
         <span class="viewer-count" id="viewerCount"></span>
       </div>
       <div class="viewer-actions">
+        <button type="button" class="fit-btn" id="viewerNote" hidden aria-expanded="false" aria-controls="viewerNotePanel">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.500 10.900c.6.5 1 1.200 1 2.100h5c0-.9.4-1.600 1-2.100A6 6 0 0 0 12 3Z"/></svg>
+          <span>Gedanke</span>
+        </button>
         <button type="button" class="icon-btn" id="viewerFlip" data-i18n-aria="flipCard" aria-label="Flip card">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg>
         </button>
@@ -1352,6 +1380,8 @@ html, body {
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </div>
+
+    <div class="vn-panel" id="viewerNotePanel" role="region" aria-labelledby="vnTitle" hidden></div>
 
     <p class="viewer-hint" data-i18n="viewerHint">Tap the card to flip · swipe or use ← → to browse</p>
   </div>
@@ -1541,6 +1571,20 @@ window.COR_DEO_META = {
   58: { title: "Lebensgeschichten: Josef & Ruth", keywords: ["josef", "ruth", "lebensgeschichte", "1", "mose", "37", "gewobene", "hoffnungen", "helfende", "menschen", "gottes", "bestimmung", "noomi", "boas", "life", "story"] },
   59: { title: "Bereitet zur ewigen Gemeinschaft", keywords: ["johannes", "14,2", "reicher", "jüngling", "henoch", "matthäus", "19", "hebräer", "11", "ewiges", "leben", "nachfolge", "eternal", "life"] },
   60: { title: "Wandeln in der Fülle von Gottes Willen", keywords: ["lebensreise", "wegweiser", "hingabe", "barmherzigkeit", "dienst", "gehorsam", "verwandlung", "gemeinschaft", "journey", "path"] },
+};
+
+/* ----------------------------------------------------------------------------
+   C) GEDANKE ZUR KARTE  (optional)
+   Kurze Erklärung, die im Großansicht-Fenster hinter dem Knopf "Gedanke" erscheint.
+   Schlüssel = Kartennummer. Weitere Karten einfach nach demselben Muster ergänzen.
+   ---------------------------------------------------------------------------- */
+window.COR_DEO_NOTES = {
+  57: {
+    title: "Ein Tuch, viele Fäden",
+    text: "Gottes Wille ist wie ein kostbares Tuch. Er webt es aus vielen Fäden, und jeder Faden ist wichtig. Die zehn Felder auf der Karte sind solche Fäden: Glaube, Demut, Dienst, Gebet, Gemeinschaft und mehr. Gott führt jeden Gläubigen mit besonderem Nachdruck auf bestimmte Fäden zu, je nach Gabe, Lebensphase und Berufung. Niemand muss alle Fäden allein halten. Wo du stark bist, stützt du andere; wo du schwach bist, wirst du getragen. So entsteht aus vielen Leben ein Tuch, das keiner allein weben könnte.",
+    question: "Welchen Faden webt Gott gerade in mir, wen kann ich damit stützen, und von wem darf ich mich tragen lassen?",
+    refs: "1. Korinther 12,12–27 · Römer 12,4–8 · Epheser 4,16 · Galater 6,2"
+  }
 };
 
 </script>
@@ -2307,6 +2351,7 @@ window.COR_DEO_META = {
     });
 
     $("viewerTitle").textContent = model.title ? model.number + " · " + model.title : STR.card + " " + model.number;
+    updateViewerNote(model);
     var pos = visible.indexOf(viewerIndex);
     var total = visible.length || cards.length;
     $("viewerCount").textContent = (pos > -1 ? pos + 1 : model.number) + " " + STR.of + " " + total;
@@ -2317,6 +2362,19 @@ window.COR_DEO_META = {
       var nb = neighbour(d);
       if (nb > -1 && nb !== viewerIndex) { (new Image()).src = cards[nb].front; (new Image()).src = cards[nb].back; }
     });
+  }
+
+  /** "Gedanke zur Karte": Knopf + Panel, nur für Karten mit Eintrag in COR_DEO_NOTES. */
+  function updateViewerNote(model) {
+    var note = (window.COR_DEO_NOTES || {})[model.number], btn = $("viewerNote"), panel = $("viewerNotePanel");
+    panel.hidden = true; panel.innerHTML = ""; btn.setAttribute("aria-expanded", "false");
+    if (!note) { btn.hidden = true; return; }
+    btn.hidden = false;
+    function add(tag, cls, txt, id) { var n = el(tag, cls); n.textContent = txt; if (id) n.id = id; panel.appendChild(n); }
+    add("h3", "vn-title", note.title, "vnTitle");
+    add("p", "vn-text", note.text);
+    if (note.question) add("p", "vn-q", note.question);
+    if (note.refs) add("p", "vn-refs", note.refs);
   }
 
   function updateViewerFace() {
@@ -2379,6 +2437,11 @@ window.COR_DEO_META = {
   function setupViewer() {
     $("viewerClose").addEventListener("click", closeViewer);
     $("viewerFlip").addEventListener("click", flipViewer);
+    $("viewerNote").addEventListener("click", function () {
+      var panel = $("viewerNotePanel"), open = panel.hidden;
+      panel.hidden = !open; this.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) panel.scrollTop = 0;
+    });
     $("viewerPrev").addEventListener("click", function () { stepViewer(-1); });
     $("viewerNext").addEventListener("click", function () { stepViewer(1); });
     if (document.fullscreenEnabled) {
