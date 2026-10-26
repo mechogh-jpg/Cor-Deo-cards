@@ -983,6 +983,120 @@ html, body {
 .gm-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .gm-new { color: var(--gold-bright); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; }
 @media (prefers-reduced-motion: reduce) { .gm-bar span, .gm-btn { transition: none; } }
+
+/* ============================================================================
+   WILLE: DAS LEBENDIGE HERZ
+   ============================================================================ */
+.wl { padding-block: 26px 40px; display: grid; gap: 22px; max-width: 760px; }
+.wl-head { text-align: center; }
+.wl-head .draw-lead { margin-inline: auto; }
+
+.wl-fig { margin: 0; display: grid; gap: 12px; justify-items: center; }
+.wl-heart { width: min(78vw, 300px); filter: drop-shadow(0 0 22px rgba(216, 180, 90, .28)); }
+.wl-heart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.wl-heart-bg { fill: rgba(255, 255, 255, .04); }
+.wl-heart-fill { transition: transform 1.4s cubic-bezier(.2, .8, .2, 1); }
+.wl-heart-line { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linejoin: round; }
+.wl-cross-halo { fill: none; stroke: #fff6d6; stroke-width: 9; stroke-linecap: round; opacity: .9; }
+.wl-cross { fill: none; stroke: var(--on-gold); stroke-width: 5; stroke-linecap: round; opacity: .85; }
+:root[data-theme="light"] .wl-cross { stroke: var(--gold-deep); }
+.wl-star { fill: var(--text-muted); opacity: .45; }
+.wl-star.s1 { fill: var(--gold); opacity: .85; }
+.wl-star.s2 { fill: #fff6d6; opacity: 1; animation: wlTwinkle 3s ease-in-out infinite; }
+.wl-heart svg { animation: wlBeat 4.5s ease-in-out infinite; transform-origin: 50% 55%; }
+@keyframes wlTwinkle { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+@keyframes wlBeat { 0%, 100% { transform: scale(1); } 8% { transform: scale(1.025); } 16% { transform: scale(1); } 24% { transform: scale(1.018); } 34% { transform: scale(1); } }
+
+.wl-cap { text-align: center; font-size: .92rem; color: var(--text-muted); display: grid; gap: 8px; justify-items: center; }
+.wl-count { color: var(--gold-bright); font-weight: 600; letter-spacing: .02em; }
+.wl-legend { display: inline-flex; gap: 14px; flex-wrap: wrap; justify-content: center; font-size: .78rem; letter-spacing: .04em; }
+.wl-leg { display: inline-flex; align-items: center; gap: 6px; }
+
+.wl-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--text-muted); flex: none; display: inline-block; }
+.wl-dot.s1 { border-color: var(--gold); border-style: dashed; }
+.wl-dot.s2 { border-color: var(--gold-bright); background: var(--gold); box-shadow: 0 0 8px rgba(216, 180, 90, .8); }
+
+.wl-card { border: 1px solid var(--line); background: var(--surface); border-radius: 18px; padding: 20px 20px 16px; }
+.wl-def { margin: 6px 0 4px; font-family: var(--font-display); font-size: 1.28rem; line-height: 1.62; color: var(--text); }
+@media (min-width: 620px) { .wl-def { font-size: 1.42rem; } }
+.wl-w {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0 1px; margin: 0;
+  border-bottom: 1.5px dotted var(--text-muted); cursor: pointer; border-radius: 3px;
+  transition: color .25s, background .25s, border-color .25s;
+}
+.wl-w:hover { background: var(--surface-strong); }
+.wl-w.s1 { border-bottom-color: var(--gold); color: var(--gold-bright); }
+.wl-w.s2 { border-bottom: 2px solid var(--gold); color: var(--on-gold); background: linear-gradient(180deg, var(--gold-bright), var(--gold)); padding: 0 5px; box-shadow: 0 0 14px -2px rgba(216, 180, 90, .75); }
+
+.wl-pair { display: grid; gap: 14px; }
+@media (min-width: 560px) { .wl-pair { grid-template-columns: 1fr 1fr; } }
+.wl-mini { display: grid; gap: 8px; align-content: start; justify-items: start; }
+.wl-mini-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; color: var(--gold-bright); }
+.wl-mini-note { margin: 0; color: var(--text-muted); font-size: .9rem; line-height: 1.5; }
+
+.wl-group { display: grid; gap: 10px; }
+.wl-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.wl-group-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.45rem; }
+.wl-group-sub { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.wl-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.wl-chip {
+  min-height: 46px; display: inline-flex; align-items: center; gap: 9px; padding: 8px 15px 8px 12px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--text-muted);
+  font: 500 .92rem var(--font-ui); text-align: left; cursor: pointer;
+  transition: background .25s, color .25s, border-color .25s, box-shadow .25s, transform .25s;
+}
+.wl-chip:hover { color: var(--text); border-color: var(--line-strong); transform: translateY(-1px); }
+.wl-chip.s1 { border-style: dashed; border-color: var(--gold); color: var(--text); }
+.wl-chip.s1 .wl-dot { border-color: var(--gold); border-style: dashed; }
+.wl-chip.s2 {
+  color: var(--on-gold); border-color: var(--gold-bright);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  box-shadow: 0 0 14px -3px rgba(216, 180, 90, .7);
+}
+.wl-chip.s2.g2 { box-shadow: 0 0 20px -2px rgba(243, 217, 143, .85); }
+.wl-chip.s2.g3 { box-shadow: 0 0 26px 0 rgba(243, 217, 143, 1); }
+.wl-chip.s2 .wl-dot { background: var(--on-gold); border-color: var(--on-gold); box-shadow: none; }
+.wl-chip-name { line-height: 1.2; }
+
+.wl-credit { margin: 8px 0 0; text-align: center; font-size: .8rem; letter-spacing: .05em; color: var(--text-muted); font-style: italic; }
+
+/* ---- Detailblatt ------------------------------------------------------------ */
+.wl-sheet { position: fixed; inset: 0; z-index: 60; display: grid; align-items: end; justify-items: center; }
+.wl-sheet[hidden] { display: none; }
+.wl-back { position: absolute; inset: 0; background: rgba(4, 6, 16, .72); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); animation: wlFade .25s ease both; }
+.wl-panel {
+  position: relative; width: min(100%, 560px); max-height: min(88vh, 760px); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg-1); border: 1px solid var(--line-strong); border-bottom: 0; border-radius: 22px 22px 0 0;
+  padding: 18px 20px calc(24px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -20px 60px -10px rgba(0, 0, 0, .7);
+  animation: wlRise .32s cubic-bezier(.2, .8, .2, 1) both; outline: none;
+}
+@media (min-width: 700px) { .wl-sheet { align-items: center; } .wl-panel { border-radius: 22px; border-bottom: 1px solid var(--line-strong); } }
+@keyframes wlRise { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes wlFade { from { opacity: 0; } to { opacity: 1; } }
+.wl-lock, .wl-lock body { overflow: hidden; }
+.wl-panel-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.wl-badge { padding: 4px 12px; border-radius: 999px; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; border: 1px solid var(--line); color: var(--text-muted); }
+.wl-badge.s1 { border-style: dashed; border-color: var(--gold); color: var(--gold-bright); }
+.wl-badge.s2 { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--on-gold); border-color: var(--gold-bright); }
+.wl-panel-title { margin: 12px 0 4px; font-family: var(--font-display); font-weight: 600; font-size: 2rem; line-height: 1.15; color: var(--gold-bright); }
+.wl-panel-state { margin: 0 0 6px; font-size: .86rem; color: var(--text-muted); }
+.wl-label { margin: 16px 0 4px; font-size: .7rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+.wl-text { margin: 0; font-size: 1rem; line-height: 1.62; }
+.wl-refs { margin: 0; font-size: .92rem; line-height: 1.55; color: var(--text-muted); }
+.wl-q { margin: 0; font-family: var(--font-display); font-style: italic; font-size: 1.28rem; line-height: 1.45; color: var(--gold-bright); }
+.wl-cards, .wl-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.wl-actions { margin-top: 20px; }
+
+@media (max-width: 360px) {
+  .tabbar { gap: 2px; }
+  .tab { font-size: .74rem; padding: 0 2px; letter-spacing: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wl-heart svg, .wl-star.s2, .wl-panel, .wl-back { animation: none; }
+  .wl-heart-fill { transition: none; }
+}
+.credit-line { margin: 10px 0 0; font-size: .78rem; letter-spacing: .04em; font-style: italic; opacity: .85; }
 </style>
 </head>
 
@@ -1025,6 +1139,10 @@ html, body {
         <button type="button" role="tab" class="tab" id="tab-game" data-tab="game" aria-selected="false" aria-controls="view-game" tabindex="-1">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.600 5.400 5.900.8-4.300 4.100 1 5.800L12 16.300 6.800 19.100l1-5.800L3.500 9.200l5.900-.8Z"/></svg>
           <span data-i18n="tabGame">Spiel</span>
+        </button>
+        <button type="button" role="tab" class="tab" id="tab-wille" data-tab="wille" aria-selected="false" aria-controls="view-wille" tabindex="-1">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5C6 16 3 12.800 3 9.300 3 6.800 4.900 5 7.200 5c1.900 0 3.700 1 4.800 2.700C13.100 6 14.900 5 16.800 5 19.100 5 21 6.800 21 9.300c0 3.500-3 6.700-9 11.200Z"/></svg>
+          <span data-i18n="tabWille">Wille</span>
         </button>
       </div>
     </nav>
@@ -1117,6 +1235,11 @@ html, body {
       <p class="sr-only" id="gameLive" role="status" aria-live="polite"></p>
     </section>
 
+    <!-- ======================  VIEW: WILLE (lebendiges Herz)  ====================== -->
+    <section class="view" id="view-wille" data-view="wille" role="tabpanel" aria-labelledby="tab-wille" hidden>
+      <div class="container wl" id="wlRoot"></div>
+    </section>
+
     <!-- ======================  VIEW 3: LIBRARY (all 60 cards)  ====================== -->
     <div class="view" id="view-library" data-view="library" role="tabpanel" aria-labelledby="tab-library" hidden>
 
@@ -1180,6 +1303,7 @@ html, body {
     <footer class="container footer">
       <div class="ornament" aria-hidden="true"><span></span><i></i><span></span></div>
       <p id="footerText"></p>
+      <p class="credit-line" id="creditLine"></p>
     </footer>
 
     <noscript><p class="notice" style="margin:2rem auto;max-width:36rem">Please enable JavaScript to view the card deck.</p></noscript>
@@ -2454,7 +2578,7 @@ window.COR_DEO_META = {
     renderJourney();
   }
 
-  var VIEWS = ["draw", "journey", "library", "game"];
+  var VIEWS = ["draw", "journey", "library", "game", "wille"];
 
   /** Show one of the four views. Also exposed to app.js (Random Card etc. need the Library). */
   function showView(name, scrollUp) {
@@ -2467,6 +2591,7 @@ window.COR_DEO_META = {
       tab.tabIndex = on ? 0 : -1;
     });
     if (name === "journey") renderJourney();
+    if (name === "wille" && A.renderWille) A.renderWille();                 // wille: Herz neu zeichnen
     if (scrollUp !== false) {
       var app = $("app"), top = $("tabbar").offsetTop;
       if (app.scrollTop > top) app.scrollTo({ top: top, behavior: "auto" });
@@ -2475,6 +2600,7 @@ window.COR_DEO_META = {
 
   function setupTabs() {
     A.showView = showView;
+    A.getJourney = function () { return state; };                               // wille: Zugriff auf Tagebuch
     function setBarHeight() { document.documentElement.style.setProperty("--tabs-h", $("tabbar").offsetHeight + "px"); }
     setBarHeight();
     window.addEventListener("resize", setBarHeight);
@@ -2699,6 +2825,7 @@ window.COR_DEO_META = {
   function completeReflection() {
     if (!state.today) return;
     var before = computeStats(), beforeLevel = levelFor(before.totalDays);
+    var litBefore = A.litGems ? A.litGems() : null;                             // wille
     var note = $("reflect").value.trim();
     var date = todayStr(), cardNo = state.today.card;
     var entry = findEntry(date, cardNo);
@@ -2710,6 +2837,10 @@ window.COR_DEO_META = {
     var msg = STR.savedMsg;
     if (afterLevel > beforeLevel) msg = "🌱 " + STR.phaseWord + " " + afterLevel + ": " + STR["phase" + afterLevel] + " — " + msg;
     else if (after.streak > 1) msg += " " + A.fmt(STR.streakDays, { n: after.streak }) + ".";
+    if (litBefore && A.newGemNames) {                                           // wille: neue Facette leuchtet
+      var gems = A.newGemNames(litBefore);
+      if (gems.length) msg += " ✨ " + (gems.length > 1 ? "Neue Facetten leuchten" : "Neue Facette leuchtet") + " im Tab Wille: " + gems.join(", ") + ".";
+    }
     $("completeMsg").textContent = msg;
     $("completeBtn").textContent = STR.updateBtn;
     renderJourney();
@@ -3285,6 +3416,487 @@ window.COR_DEO_META = {
     buildPool();
     if (pool.length < 4) { var tab = $("tab-game"); if (tab) tab.hidden = true; return; }      // zu wenige Karten: Tab ausblenden
     renderIntro();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
+  <script>
+/* ============================================================================
+   COR DEO — "WILLE": DAS LEBENDIGE HERZ
+   ----------------------------------------------------------------------------
+   Die Definition vom Willen Gottes als lebendiges Herz mit 30 Facetten.
+   Jede Facette ("Edelstein") leuchtet, wenn du über eine passende Karte
+   reflektiert hast (Tab "Ziehen" → "Heute reflektiert ✓").
+     verborgen  = noch keine passende Karte gezogen
+     geweckt    = passende Karte gezogen, noch nicht reflektiert
+     leuchtet   = reflektiert (je öfter, desto heller, bis Stufe 3)
+
+   Zum Bearbeiten:
+     DEFINITION  = der Text der Definition (Wörter in [ ] sind antippbare Facetten)
+     GEMS        = die 30 Facetten: Bedeutung, Bibelstellen, Frage, Karten
+                   lights = Karten, die die Facette zum Leuchten bringen (nur Karten aus dem Ziehen-Pool)
+                   more   = weitere Karten zum Ansehen
+   Entfernen: diesen <script>-Block, den Tab "tab-wille", den Abschnitt "view-wille"
+   und die mit "wille" markierten Zeilen in der Tab-Logik löschen.
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  var DEFINITION =
+    "Der Wille Gottes für Seine Kinder ist eine umfassende Berufung zu einem [verwandelt|verwandelten Leben], " +
+    "das aus [gnade|Gnade] geschenkt wird, in [christus|Christus] sein Vorbild hat, in der [liebe|Liebe] zu Gott und zum Nächsten gelebt wird und " +
+    "sowohl Seinen [charakter|Charakter widerspiegelt] als auch Seine [erloesung|erlösenden Absichten] in der Welt aktiv vorantreibt. " +
+    "Dies beinhaltet tiefe [erneuerung|innere Erneuerung] und [umkehr|Umkehr], die Kultivierung von [heiligkeit|Heiligkeit], [demut|Demut] " +
+    "und einer vom [geist|Geist geleiteten Haltung] durch unerschütterlichen [glaube|Glauben], " +
+    "[vertrauen|Vertrauen in Seine Souveränität], [hoffnung|lebendige Hoffnung] und [hingabe|Hingabe] an Seine göttliche Formung. " +
+    "Gleichzeitig erfordert es äußeres Engagement durch ganzherzigen [gehorsam|Gehorsam] gegenüber Seinem [wort|Wort], " +
+    "beständiges [gebet|Gebet] und [dank|Dankbarkeit], [ausharren|geduldiges Ausharren auch im Leiden], " +
+    "viel [frucht|Frucht zu tragen], selbstlosen [dienst|Dienst] an anderen in der [gemeinde|Gemeinschaft Seines Volkes], " +
+    "mutiges Streben nach [gerecht|Gerechtigkeit] und [friede|Friedensstiftung] " +
+    "sowie engagierte Teilnahme an [juenger|Jüngerschaft] und [evangelium|Evangelisation]. " +
+    "All dies steht letztlich im Einklang mit Seinem Herzenswunsch, [niemand|dass niemand verloren geht], " +
+    "und dem Leben in [vorbereitung|freudiger Vorbereitung] auf die [ewig|ewige Gemeinschaft].";
+
+  var GROUPS = [
+    { id: "quelle",      name: "Die Quelle",       sub: "Woher alles kommt" },
+    { id: "verwandlung", name: "Die Verwandlung",  sub: "Was Gott in uns tut" },
+    { id: "hingabe",     name: "Die Hingabe",      sub: "Wie wir antworten" },
+    { id: "frucht",      name: "Die Frucht",       sub: "Was daraus wächst" },
+    { id: "ziel",        name: "Das Ziel",         sub: "Wohin es führt" }
+  ];
+
+  var GEMS = [
+    { id: "gnade", g: "quelle", name: "Gnade",
+      text: "Alles beginnt mit Gottes Geschenk. Sein Wille ist keine Leistung, mit der wir uns Annahme verdienen, sondern der Weg und die Kraft eines Kindes, das schon angenommen ist.",
+      refs: "Epheser 2,8–10 · Philipper 2,12–13 · Titus 2,11–12",
+      q: "Wo versuche ich heute, mir etwas zu verdienen, was Gott mir längst schenkt?",
+      lights: [36, 37], more: [41] },
+    { id: "christus", g: "quelle", name: "Christus",
+      text: "Gottes Wille hat ein Gesicht. In Jesus sehen wir, wie ein Leben aussieht, das dem Vater ganz gehört, bis hin zu Gethsemane. Er ist Vorbild und zugleich der, der uns Kraft gibt.",
+      refs: "Römer 8,29 · Johannes 4,34 · Lukas 22,42 · Hebräer 12,2",
+      q: "Wie würde Jesus heute in meiner Lage handeln?",
+      lights: [42, 45], more: [57] },
+    { id: "liebe", g: "quelle", name: "Liebe",
+      text: "Die Mitte von allem: Gott lieben und den Nächsten wie sich selbst. Alles andere im Willen Gottes wächst aus dieser Wurzel.",
+      refs: "Matthäus 22,37–40 · Römer 13,10 · 1. Johannes 4,19–21",
+      q: "Wen soll ich heute ganz konkret lieben, auch wenn es mich etwas kostet?",
+      lights: [24], more: [20] },
+    { id: "glaube", g: "quelle", name: "Glaube",
+      text: "Glauben heißt, Gott zu vertrauen, bevor ich das Ganze sehe, und mich auf Sein Wort zu stützen. Ohne Glauben ist es unmöglich, Gott zu gefallen.",
+      refs: "Hebräer 11,6 · Johannes 6,40 · Römer 4,20–21",
+      q: "Wo wartet Gott darauf, dass ich Ihm einfach glaube?",
+      lights: [50, 59], more: [16] },
+    { id: "vertrauen", g: "quelle", name: "Vertrauen",
+      text: "Vertrauen ist Glaube im Alltag. Gott kennt den Weg und den richtigen Zeitpunkt, auch wenn ich beides noch nicht erkenne.",
+      refs: "Sprüche 3,5–6 · Psalm 32,8 · Epheser 1,11",
+      q: "Worauf verlasse ich mich gerade mehr als auf Gott?",
+      lights: [49], more: [4, 51] },
+    { id: "hoffnung", g: "quelle", name: "Hoffnung",
+      text: "Hoffnung ist die feste Erwartung, dass Gott zu Seinem Ziel kommt, auch wenn ich es noch nicht sehe. Sie hält mich im Dunkeln auf dem Weg.",
+      refs: "Römer 15,13 · Römer 5,3–5 · Hebräer 6,19",
+      q: "Welche Lage sehe ich zu dunkel, weil ich Gottes Ziel aus den Augen verloren habe?",
+      lights: [50, 53], more: [15] },
+
+    { id: "verwandelt", g: "verwandlung", name: "Verwandeltes Leben",
+      text: "Das Herzstück: nicht nur anderes Verhalten, sondern ein neuer Mensch, der von innen wächst. Gott verändert uns Schritt für Schritt in das Bild Seines Sohnes.",
+      refs: "Römer 12,2 · 2. Korinther 3,18 · Galater 2,20",
+      q: "Welche Gewohnheit zeigt mir, dass ich noch dem Zeitgeist ähnle?",
+      lights: [52, 22], more: [57, 60] },
+    { id: "erneuerung", g: "verwandlung", name: "Innere Erneuerung",
+      text: "Gott beginnt bei Gedanken, Wünschen und Beweggründen, nicht bei der Fassade. Wie ein Töpfer formt Er geduldig, wenn ich mich formen lasse.",
+      refs: "Römer 12,2 · Epheser 4,22–24 · Jesaja 64,7–8",
+      q: "Welchen Bereich meines Denkens lasse ich Gott noch nicht erneuern?",
+      lights: [46, 52], more: [41] },
+    { id: "umkehr", g: "verwandlung", name: "Umkehr",
+      text: "Umkehr ist die Tür, die immer offen steht: Sünde beim Namen nennen, mich abwenden und zu Gott zurückkehren. Gott will Rettung und Neuanfang, nicht Verderben.",
+      refs: "2. Petrus 3,9 · 1. Johannes 1,9 · Psalm 51",
+      q: "Wo brauche ich heute einen ehrlichen Neuanfang?",
+      lights: [35], more: [41] },
+    { id: "heiligkeit", g: "verwandlung", name: "Heiligkeit",
+      text: "Das ist der Wille Gottes: eure Heiligung. Heilig heißt: für Gott abgesondert und rein im Herzen, nicht kalt und streng, sondern ganz Sein.",
+      refs: "1. Thessalonicher 4,3 · 1. Petrus 1,15–16 · Hebräer 12,14",
+      q: "Wovor sollte ich fliehen, statt damit zu spielen?",
+      lights: [26, 27], more: [] },
+    { id: "demut", g: "verwandlung", name: "Demut",
+      text: "Demut heißt nicht, klein von mir zu denken, sondern Gott groß sein zu lassen. Sie öffnet den Weg für Gnade und für Gemeinschaft.",
+      refs: "Philipper 2,3–8 · Jakobus 4,6 · Micha 6,8",
+      q: "Wo muss ich zugeben, dass ich Hilfe brauche?",
+      lights: [28], more: [] },
+    { id: "geist", g: "verwandlung", name: "Heiliger Geist",
+      text: "Gottes Wille ist nicht aus eigener Kraft zu leben. Der Geist wohnt in uns, führt, erinnert an Gottes Wort und schenkt Frucht.",
+      refs: "Galater 5,16–25 · Römer 8,14 · Johannes 14,26",
+      q: "Auf wessen Stimme habe ich heute am meisten gehört?",
+      lights: [29], more: [] },
+    { id: "charakter", g: "verwandlung", name: "Widerspiegelung Seines Charakters",
+      text: "Wir werden Ihm ähnlich: in Liebe, Gerechtigkeit, Barmherzigkeit, Treue und Geduld. Ein Kind trägt die Züge seines Vaters.",
+      refs: "Epheser 5,1 · 2. Mose 34,6 · Matthäus 5,48",
+      q: "Welche Eigenschaft Gottes sollen andere heute durch mich sehen?",
+      lights: [39, 36], more: [20] },
+
+    { id: "hingabe", g: "hingabe", name: "Hingabe",
+      text: "Sich ganz Gott zur Verfügung stellen, wie Maria: Mir geschehe nach deinem Wort. Hingabe ist keine Niederlage, sondern der sichere Platz in Gottes Hand.",
+      refs: "Römer 12,1 · Lukas 1,38 · Matthäus 16,24",
+      q: "Was halte ich noch zurück?",
+      lights: [47], more: [48, 42] },
+    { id: "gehorsam", g: "hingabe", name: "Gehorsam",
+      text: "Gehorsam ist die Antwort der Liebe. Wer den Willen des Vaters tut, baut sein Haus auf Fels.",
+      refs: "Matthäus 7,21–27 · Johannes 14,15 · 1. Mose 6,22",
+      q: "Welchen Schritt kenne ich schon und habe ihn noch nicht getan?",
+      lights: [25, 44], more: [] },
+    { id: "wort", g: "hingabe", name: "Gottes Wort",
+      text: "Gott spricht durch Sein Wort. Wir prüfen alles daran und lassen uns davon formen, wie die Beröer, die täglich in der Schrift forschten.",
+      refs: "Johannes 7,17 · Apostelgeschichte 17,11 · Psalm 119,105 · 2. Timotheus 3,16–17",
+      q: "Was hat Gott mir zuletzt durch Sein Wort gesagt, und was habe ich damit getan?",
+      lights: [18], more: [] },
+    { id: "gebet", g: "hingabe", name: "Gebet",
+      text: "Im Gebet suchen wir Führung und wachsen in der Beziehung. Paulus betet, dass wir mit der Erkenntnis des Willens Gottes erfüllt werden.",
+      refs: "Kolosser 1,9 · 1. Thessalonicher 5,17 · Matthäus 6,9–10",
+      q: "Was bringe ich Gott heute, bevor ich selbst entscheide?",
+      lights: [23, 54], more: [] },
+    { id: "dank", g: "hingabe", name: "Dankbarkeit",
+      text: "In allem danken, nicht für alles, aber in allem. Dankbarkeit hält das Herz weich und den Blick auf Gott gerichtet.",
+      refs: "1. Thessalonicher 5,16–18 · Psalm 100,4 · Kolosser 3,15–17",
+      q: "Wofür danke ich Gott heute ausdrücklich?",
+      lights: [55, 56], more: [] },
+    { id: "ausharren", g: "hingabe", name: "Ausharren im Leiden",
+      text: "Zum Willen Gottes gehört auch das Durchhalten: im Warten, im Gegenwind, ja im Leiden um des Guten willen. Gott gebraucht es zur Reifung.",
+      refs: "1. Petrus 3,17 · 1. Petrus 4,19 · Hebräer 12,1–2 · Jakobus 1,2–4",
+      q: "Wo bin ich müde geworden, und wen darf ich um Beistand bitten?",
+      lights: [43, 53], more: [15] },
+
+    { id: "frucht", g: "frucht", name: "Fruchtbarkeit",
+      text: "Ein verwandeltes Leben trägt Frucht: Charakter und Taten, die anderen guttun und den Vater ehren. Frucht wächst, wo wir am Weinstock bleiben.",
+      refs: "Johannes 15,5–8 · Galater 5,22–23 · Lukas 13,6–9",
+      q: "Welche Frucht sollte in meinem Leben deutlicher zu sehen sein?",
+      lights: [30], more: [31] },
+    { id: "dienst", g: "frucht", name: "Dienst",
+      text: "Groß ist, wer dient. Jesus wäscht Füße, und Treue im Kleinen zählt bei Gott mehr als Beifall.",
+      refs: "Galater 5,13 · Johannes 13,1–17 · 1. Korinther 4,2",
+      q: "Wem kann ich heute ganz praktisch dienen?",
+      lights: [32, 34], more: [] },
+    { id: "gerecht", g: "frucht", name: "Gerechtigkeit",
+      text: "Recht tun, Güte lieben und demütig mit Gott gehen. Gerechtigkeit nimmt Gottes Maßstab ernst, auch für mich selbst, und tritt für andere ein.",
+      refs: "Micha 6,8 · Amos 5,24 · 2. Samuel 12",
+      q: "Wo schaue ich weg, obwohl ich eintreten sollte?",
+      lights: [35], more: [] },
+    { id: "friede", g: "frucht", name: "Friedensstiftung",
+      text: "Selig sind, die Frieden stiften. Frieden suchen heißt oft: den ersten Schritt gehen, auch wenn ich im Recht bin.",
+      refs: "Matthäus 5,9 · Römer 12,18 · 1. Samuel 25",
+      q: "Mit wem mache ich heute den ersten Schritt zum Frieden?",
+      lights: [38], more: [] },
+    { id: "gemeinde", g: "frucht", name: "Gemeinde",
+      text: "Wir sind Kinder, im Plural. Gottes Wille wird gemeinsam gelebt: in Einheit, Ermutigung und gegenseitigem Tragen. Niemand wächst allein.",
+      refs: "Johannes 17,20–23 · Epheser 4,1–6 · Hebräer 10,24–25",
+      q: "Wem in meiner Gemeinde kann ich heute Mut machen?",
+      lights: [40], more: [3, 39] },
+
+    { id: "juenger", g: "ziel", name: "Jüngerschaft",
+      text: "Nachfolge heißt lernen, mit Jesus zu leben, und das an andere weiterzugeben. Wie Elisa bei Elia gehen wir mit und lassen alles andere zurück.",
+      refs: "Matthäus 28,19–20 · Lukas 9,23 · 2. Timotheus 2,2",
+      q: "Von wem lerne ich, und wem gebe ich weiter?",
+      lights: [33, 21], more: [] },
+    { id: "evangelium", g: "ziel", name: "Evangelisation",
+      text: "Die gute Nachricht ist zu groß, um sie für sich zu behalten. Wir sind gesandt, als Boten und als Botschaft.",
+      refs: "Jesaja 6,8 · Römer 10,14–15 · 1. Petrus 3,15",
+      q: "Wem könnte ich diese Woche von Jesus erzählen?",
+      lights: [33], more: [] },
+    { id: "niemand", g: "ziel", name: "Niemand soll verloren gehen",
+      text: "Das Herz Gottes: Er will, dass alle zur Umkehr kommen und gerettet werden. Er sucht, bis Er findet.",
+      refs: "2. Petrus 3,9 · 1. Timotheus 2,4 · Lukas 15,4–7",
+      q: "Für wen bete ich, damit er gefunden wird?",
+      lights: [7], more: [] },
+    { id: "erloesung", g: "ziel", name: "Erlösungsziele vorantreiben",
+      text: "Wir sind keine Zuschauer. Gott lässt uns an Seinem Plan teilhaben: Menschen zu retten, Gerechtigkeit aufzurichten und Sein Reich sichtbar zu machen.",
+      refs: "Epheser 2,10 · Esther 4,14 · Matthäus 6,10",
+      q: "Wo setzt Gott mich ein, damit Sein Reich sichtbar wird?",
+      lights: [8], more: [10, 57] },
+    { id: "vorbereitung", g: "ziel", name: "Freudige Vorbereitung",
+      text: "Wer das Ziel kennt, lebt anders: wachsam, froh und bereit, wie Gäste, die ein Fest erwarten.",
+      refs: "Philipper 4,4–5 · Titus 2,13 · Matthäus 25,1–13",
+      q: "Wenn Jesus heute käme: Wofür wäre ich dankbar, und was möchte ich noch klären?",
+      lights: [59, 55], more: [10] },
+    { id: "ewig", g: "ziel", name: "Ewige Gemeinschaft",
+      text: "Das Ziel von allem: für immer bei Gott und mit Seinem Volk. Jesus bereitet einen Platz, und Gott wird alle Tränen abwischen.",
+      refs: "Johannes 14,1–3 · Offenbarung 21,3–4 · 1. Thessalonicher 4,17",
+      q: "Was von dem, was mich heute beschäftigt, hat ewiges Gewicht?",
+      lights: [59], more: [10] }
+  ];
+
+  var TXT = {
+    de: {
+      kicker: "Der Wille Gottes", title: "Das lebendige Herz",
+      lead: "Dein Weg im Willen Gottes als Herz mit 30 Facetten. Jede Facette leuchtet, wenn du über eine passende Karte nachgedacht hast.",
+      count: "{n} von {t} Facetten leuchten", seen: "{n} geweckt",
+      legend: ["verborgen", "geweckt", "leuchtet"],
+      defKicker: "Was ist der Wille Gottes?", defHint: "Tippe auf ein hervorgehobenes Wort, um zu sehen, was darin steckt.",
+      today: "Heute im Blick", focusKicker: "Mein Leitwort", focusNone: "Wähle eine Facette als Leitwort, die dich begleiten soll.",
+      setFocus: "Als Leitwort wählen", clearFocus: "Leitwort entfernen", open: "Ansehen",
+      stateHidden: "Noch verborgen", stateSeen: "Geweckt", stateLit: "Leuchtet",
+      stHiddenTxt: "Ziehe eine passende Karte und reflektiere darüber, dann beginnt diese Facette zu leuchten.",
+      stSeenTxt: "Du hast eine passende Karte gezogen. Schreibe eine Reflexion, dann leuchtet die Facette.",
+      stLitTxt: "Du hast {n}× darüber reflektiert.",
+      meaning: "Was darin steckt", refsLabel: "Bibelstellen", ask: "Frage für heute", cardsLabel: "Karten dazu", cardWord: "Karte",
+      draw: "Karte ziehen", close: "Schließen", newGem: "Neue Facette leuchtet", newGems: "Neue Facetten leuchten",
+      credit: "Michael Ghaly. Alle Ehre gehört Gott allein.",
+      aria: "{name}: {state}"
+    }
+  };
+
+  var FOCUS_KEY = "cordeo:wille:focus";
+  var A, cards = [], root, sheet, lastTrigger = null, byId = {}, T = TXT.de;
+  GEMS.forEach(function (g) { byId[g.id] = g; });
+
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function fmt(s, o) { return s.replace(/\{(\w+)\}/g, function (m, k) { return o[k] != null ? o[k] : m; }); }
+  function svgEl(tag, attrs) { var e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+
+  /* ---------- Stand der Facetten (aus Tagebuch + gezogenen Karten) ---------- */
+  function journey() { return (A && A.getJourney && A.getJourney()) || { entries: [], discovered: {} }; }
+
+  function levelOf(gem, J) {
+    var count = 0, seen = false, i;
+    for (i = 0; i < J.entries.length; i++) if (gem.lights.indexOf(J.entries[i].card) >= 0) count++;
+    for (i = 0; i < gem.lights.length; i++) if (J.discovered && J.discovered[gem.lights[i]]) seen = true;
+    if (count > 0) return { lvl: 2, glow: Math.min(3, count), n: count };
+    return { lvl: seen ? 1 : 0, glow: 0, n: 0 };
+  }
+
+  function allLevels() { var J = journey(), m = {}; GEMS.forEach(function (g) { m[g.id] = levelOf(g, J); }); return m; }
+  function totals() { var m = allLevels(), lit = 0, seen = 0; GEMS.forEach(function (g) { if (m[g.id].lvl === 2) lit++; else if (m[g.id].lvl === 1) seen++; }); return { lit: lit, seen: seen, map: m }; }
+
+  /* Für journey.js: welche Facetten leuchten gerade? / wie heißen die neuen? */
+  function litSet() { var m = allLevels(), s = {}; GEMS.forEach(function (g) { if (m[g.id].lvl === 2) s[g.id] = true; }); return s; }
+  function newlyLit(before) { var after = litSet(), names = []; GEMS.forEach(function (g) { if (after[g.id] && !before[g.id]) names.push(g.name); }); return names; }
+
+  function dayNumber() { var d = new Date(); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000); }
+  function gemOfTheDay() { return GEMS[(dayNumber() * 7) % GEMS.length]; }   // 7 und 30 sind teilerfremd: jede Facette kommt vor einer Wiederholung dran
+
+  function getFocus() { var v = A && A.store ? A.store.get(FOCUS_KEY) : null; return v && byId[v] ? v : null; }
+  function setFocus(id) { if (A && A.store) A.store.set(FOCUS_KEY, id || ""); }
+
+  /* ---------- Das Herz (SVG) ---------- */
+  var HEART = "M100 170 C 38 124, 6 90, 6 52 C 6 26, 26 8, 52 8 C 73 8, 90 19, 100 37 C 110 19, 127 8, 148 8 C 174 8, 194 26, 194 52 C 194 90, 162 124, 100 170 Z";
+
+  function buildHeart(t) {
+    var wrap = el("div", "wl-heart");
+    var svg = svgEl("svg", { viewBox: "0 0 200 180", "aria-hidden": "true", focusable: "false" });
+    var defs = svgEl("defs", {});
+    var grad = svgEl("linearGradient", { id: "wlGold", x1: "0", y1: "0", x2: "0", y2: "1" });
+    grad.appendChild(svgEl("stop", { offset: "0", "stop-color": "#f3d98f" }));
+    grad.appendChild(svgEl("stop", { offset: "1", "stop-color": "#b8902f" }));
+    defs.appendChild(grad);
+    var clip = svgEl("clipPath", { id: "wlClip" }); clip.appendChild(svgEl("path", { d: HEART })); defs.appendChild(clip);
+    svg.appendChild(defs);
+
+    svg.appendChild(svgEl("path", { d: HEART, "class": "wl-heart-bg" }));
+    var fillG = svgEl("g", { "clip-path": "url(#wlClip)" });
+    var level = t.lit / GEMS.length;
+    var fill = svgEl("rect", { x: "0", y: "0", width: "200", height: "180", fill: "url(#wlGold)", "class": "wl-heart-fill", opacity: ".92" });
+    fill.style.transform = "translateY(" + (180 * (1 - level)).toFixed(1) + "px)";
+    fillG.appendChild(fill);
+    svg.appendChild(fillG);
+    svg.appendChild(svgEl("path", { d: HEART, "class": "wl-heart-line" }));
+
+    // Kreuz in der Mitte
+    svg.appendChild(svgEl("path", { d: "M100 62 V128 M76 88 H124", "class": "wl-cross-halo" }));
+    svg.appendChild(svgEl("path", { d: "M100 62 V128 M76 88 H124", "class": "wl-cross" }));
+
+    // 30 Sterne im Herzen: je einer pro Facette (feste Positionen, damit sie nicht springen)
+    var pts = [], seed = 20241026;
+    function rnd() { seed = (seed + 0x6D2B79F5) | 0; var x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x; return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }
+    var ctx2d = null, shape = null;
+    try { ctx2d = document.createElement("canvas").getContext("2d"); shape = new Path2D(HEART); } catch (e) { ctx2d = null; }   // Punkt-im-Herz-Test ohne DOM
+    var tries = 0;
+    while (pts.length < GEMS.length && tries < 4000) {
+      tries++;
+      var x = 14 + rnd() * 172, y = 14 + rnd() * 150, inside;
+      if (ctx2d && shape) inside = ctx2d.isPointInPath(shape, x, y);
+      else { var dx = (x - 100) / 90, dy = (y - 80) / 74; inside = dx * dx + dy * dy < 0.8; }
+      if (!inside) continue;
+      if (Math.abs(x - 100) < 28 && y > 56 && y < 134) continue;                 // Platz für das Kreuz
+      var far = true; for (var i = 0; i < pts.length; i++) { var ex = pts[i][0] - x, ey = pts[i][1] - y; if (ex * ex + ey * ey < 380) { far = false; break; } }
+      if (far) pts.push([x, y]);
+    }
+    var order = GEMS.map(function (g, i) { return i; });
+    pts.forEach(function (p, i) {
+      var gem = GEMS[order[i]], lv = t.map[gem.id];
+      var c = svgEl("circle", { cx: p[0].toFixed(1), cy: p[1].toFixed(1), r: lv.lvl === 2 ? (2.4 + lv.glow * 0.5).toFixed(1) : "1.7", "class": "wl-star s" + lv.lvl });
+      c.style.animationDelay = (i * 0.37 % 3).toFixed(2) + "s";
+      svg.appendChild(c);
+    });
+    wrap.appendChild(svg);
+    return wrap;
+  }
+
+  /* ---------- Seite aufbauen ---------- */
+  function chip(gem, lv) {
+    var st = T.legend[lv.lvl];
+    var b = el("button", "wl-chip s" + lv.lvl + (lv.lvl === 2 ? " g" + lv.glow : ""));
+    b.type = "button"; b.setAttribute("data-gem", gem.id);
+    b.setAttribute("aria-label", fmt(T.aria, { name: gem.name, state: st }));
+    b.appendChild(el("span", "wl-dot"));
+    b.appendChild(el("span", "wl-chip-name", gem.name));
+    b.addEventListener("click", function () { openSheet(gem.id, b); });
+    return b;
+  }
+
+  function buildDefinition(map) {
+    var p = el("p", "wl-def");
+    DEFINITION.split(/(\[[a-z]+\|[^\]]+\])/).forEach(function (part) {
+      var m = /^\[([a-z]+)\|([^\]]+)\]$/.exec(part);
+      if (!m || !byId[m[1]]) { if (part) p.appendChild(document.createTextNode(part)); return; }
+      var lv = map[m[1]], b = el("button", "wl-w s" + lv.lvl, m[2]);
+      b.type = "button"; b.setAttribute("data-gem", m[1]);
+      b.setAttribute("aria-label", fmt(T.aria, { name: byId[m[1]].name, state: T.legend[lv.lvl] }));
+      b.addEventListener("click", function () { openSheet(m[1], b); });
+      p.appendChild(b);
+    });
+    return p;
+  }
+
+  function render() {
+    if (!root) return;
+    var t = totals();
+    root.innerHTML = "";
+
+    var head = el("header", "wl-head");
+    head.appendChild(el("p", "kicker", T.kicker));
+    head.appendChild(el("h2", "draw-title", T.title));
+    head.appendChild(el("p", "draw-lead", T.lead));
+    root.appendChild(head);
+
+    var fig = el("figure", "wl-fig");
+    fig.appendChild(buildHeart({ lit: t.lit, map: t.map }));
+    var cap = el("figcaption", "wl-cap");
+    cap.appendChild(el("strong", "wl-count", fmt(T.count, { n: t.lit, t: GEMS.length })));
+    if (t.seen) cap.appendChild(el("span", "wl-seen", fmt(T.seen, { n: t.seen })));
+    var lg = el("span", "wl-legend");
+    T.legend.forEach(function (name, i) { var s = el("span", "wl-leg"); s.appendChild(el("i", "wl-dot s" + i)); s.appendChild(document.createTextNode(name)); lg.appendChild(s); });
+    cap.appendChild(lg);
+    fig.appendChild(cap);
+    root.appendChild(fig);
+
+    // Definition
+    var def = el("section", "wl-card");
+    def.appendChild(el("p", "kicker", T.defKicker));
+    def.appendChild(buildDefinition(t.map));
+    def.appendChild(el("p", "mini", T.defHint));
+    root.appendChild(def);
+
+    // Facette des Tages + Leitwort
+    var row = el("div", "wl-pair");
+    var td = gemOfTheDay(), fx = getFocus();
+    var c1 = el("div", "wl-card wl-mini");
+    c1.appendChild(el("p", "kicker", T.today)); c1.appendChild(el("h3", "wl-mini-title", td.name));
+    var o1 = el("button", "btn btn-ghost btn-sm", T.open); o1.type = "button"; o1.addEventListener("click", function () { openSheet(td.id, o1); });
+    c1.appendChild(o1);
+    var c2 = el("div", "wl-card wl-mini");
+    c2.appendChild(el("p", "kicker", T.focusKicker));
+    if (fx) {
+      c2.appendChild(el("h3", "wl-mini-title", byId[fx].name));
+      var o2 = el("button", "btn btn-ghost btn-sm", T.open); o2.type = "button"; o2.addEventListener("click", function () { openSheet(fx, o2); });
+      c2.appendChild(o2);
+    } else c2.appendChild(el("p", "wl-mini-note", T.focusNone));
+    row.appendChild(c1); row.appendChild(c2);
+    root.appendChild(row);
+
+    // Gruppen
+    GROUPS.forEach(function (gr) {
+      var sec = el("section", "wl-group");
+      var h = el("div", "wl-group-head");
+      h.appendChild(el("h3", "wl-group-title", gr.name)); h.appendChild(el("span", "wl-group-sub", gr.sub));
+      sec.appendChild(h);
+      var grid = el("div", "wl-chips");
+      GEMS.filter(function (g) { return g.g === gr.id; }).forEach(function (g) { grid.appendChild(chip(g, t.map[g.id])); });
+      sec.appendChild(grid);
+      root.appendChild(sec);
+    });
+
+    root.appendChild(el("p", "wl-credit", T.credit));
+  }
+
+  /* ---------- Detailblatt ---------- */
+  function buildSheet() {
+    sheet = el("div", "wl-sheet"); sheet.hidden = true;
+    sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true"); sheet.setAttribute("aria-labelledby", "wlSheetTitle");
+    sheet.innerHTML = '<div class="wl-back" data-close="1"></div><div class="wl-panel" id="wlPanel" tabindex="-1"></div>';
+    document.body.appendChild(sheet);
+    sheet.addEventListener("click", function (e) { if (e.target && e.target.getAttribute && e.target.getAttribute("data-close")) closeSheet(); });
+    document.addEventListener("keydown", function (e) { if (!sheet.hidden && e.key === "Escape") { e.preventDefault(); closeSheet(); } });
+  }
+
+  function openSheet(id, trigger) {
+    var gem = byId[id]; if (!gem) return;
+    lastTrigger = trigger || null;
+    var lv = levelOf(gem, journey()), panel = document.getElementById("wlPanel");
+    panel.innerHTML = "";
+    var top = el("div", "wl-panel-top");
+    top.appendChild(el("span", "wl-badge s" + lv.lvl, [T.stateHidden, T.stateSeen, T.stateLit][lv.lvl]));
+    var x = el("button", "icon-btn", ""); x.type = "button"; x.setAttribute("aria-label", T.close);
+    x.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    x.addEventListener("click", closeSheet); top.appendChild(x);
+    panel.appendChild(top);
+
+    var h = el("h3", "wl-panel-title", gem.name); h.id = "wlSheetTitle"; panel.appendChild(h);
+    panel.appendChild(el("p", "wl-panel-state", lv.lvl === 2 ? fmt(T.stLitTxt, { n: lv.n }) : (lv.lvl === 1 ? T.stSeenTxt : T.stHiddenTxt)));
+
+    panel.appendChild(el("p", "wl-label", T.meaning));
+    panel.appendChild(el("p", "wl-text", gem.text));
+    panel.appendChild(el("p", "wl-label", T.refsLabel));
+    panel.appendChild(el("p", "wl-refs", gem.refs));
+    panel.appendChild(el("p", "wl-label", T.ask));
+    panel.appendChild(el("p", "wl-q", gem.q));
+
+    var all = gem.lights.concat(gem.more || []);
+    if (all.length) {
+      panel.appendChild(el("p", "wl-label", T.cardsLabel));
+      var cl = el("div", "wl-cards");
+      all.forEach(function (n) {
+        var c = cards[n - 1]; if (!c) return;
+        var b = el("button", "btn btn-ghost btn-sm", T.cardWord + " " + n + " · " + (c.title || ""));
+        b.type = "button";
+        b.addEventListener("click", function () { closeSheet(true); if (A.openViewer) A.openViewer(n - 1); });
+        cl.appendChild(b);
+      });
+      panel.appendChild(cl);
+    }
+
+    var acts = el("div", "wl-actions");
+    var isFocus = getFocus() === gem.id;
+    var f = el("button", "btn btn-primary btn-sm", isFocus ? T.clearFocus : T.setFocus); f.type = "button";
+    f.addEventListener("click", function () { setFocus(isFocus ? "" : gem.id); closeSheet(true); render(); });
+    var d = el("button", "btn btn-ghost btn-sm", T.draw); d.type = "button";
+    d.addEventListener("click", function () { closeSheet(true); if (A.showView) A.showView("draw"); });
+    acts.appendChild(f); acts.appendChild(d);
+    panel.appendChild(acts);
+
+    sheet.hidden = false;
+    document.documentElement.classList.add("wl-lock");
+    panel.scrollTop = 0;
+    setTimeout(function () { panel.focus(); }, 30);
+  }
+
+  function closeSheet(skipFocus) {
+    if (!sheet || sheet.hidden) return;
+    sheet.hidden = true;
+    document.documentElement.classList.remove("wl-lock");
+    if (skipFocus !== true && lastTrigger && document.body.contains(lastTrigger)) { try { lastTrigger.focus(); } catch (e) { /* ignore */ } }
+  }
+
+  /* ---------- Start ---------- */
+  function init() {
+    A = window.CorDeoApp; root = document.getElementById("wlRoot");
+    if (!A || !root) return;
+    cards = A.cards || [];
+    buildSheet();
+    A.renderWille = render;
+    A.litGems = litSet;
+    A.newGemNames = newlyLit;
+    A.gemCount = function () { return GEMS.length; };
+    var line = document.getElementById("creditLine"); if (line) line.textContent = T.credit;
+    render();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
