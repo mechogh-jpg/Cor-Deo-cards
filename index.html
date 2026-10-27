@@ -1121,6 +1121,26 @@ html, body {
 .vn-text { margin: 0; font-size: 1rem; line-height: 1.62; color: var(--text); }
 .vn-q { margin: 14px 0 0; font-family: var(--font-display); font-style: italic; font-size: 1.22rem; line-height: 1.45; color: var(--gold-bright); }
 .vn-refs { margin: 12px 0 0; font-size: .85rem; line-height: 1.5; color: var(--text-muted); }
+
+/* ---- Leseanleitung (erste Zeit) + Legende im Großansicht-Fenster ------------- */
+.read-tip { grid-column: 1 / -1; margin: 0; max-width: 640px; justify-self: center; width: 100%; padding: 16px 18px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface); display: grid; gap: 10px; justify-items: start; text-align: start; }
+.read-tip[hidden] { display: none; }
+.read-tip-title { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; color: var(--gold-bright); }
+.read-tip p { margin: 0; font-size: .95rem; line-height: 1.55; color: var(--text); }
+.read-tip strong { color: var(--gold-bright); font-weight: 600; }
+
+.vp-legend { display: flex; gap: 8px; justify-content: center; padding: 6px var(--gutter) 2px; }
+.vp-legend[hidden] { display: none; }
+.vp-side { flex: 1 1 0; max-width: 280px; min-width: 0; display: grid; gap: 1px; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
+.vp-side.is-warn { text-align: left; border-color: rgba(214, 112, 112, .55); }
+.vp-side.is-vor { text-align: right; border-color: rgba(120, 190, 130, .55); }
+.vp-label { font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); }
+.vp-side.is-warn .vp-label { color: #e49a9a; }
+.vp-side.is-vor .vp-label { color: #9fd3a6; }
+.vp-name { font-size: .85rem; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
+:root[data-theme="light"] .vp-side.is-warn .vp-label { color: #8f2f3a; }
+:root[data-theme="light"] .vp-side.is-vor .vp-label { color: #2f6a3a; }
+@media (max-height: 520px) { .vp-legend { display: none; } }
 </style>
 </head>
 
@@ -1174,6 +1194,12 @@ html, body {
     <!-- ======================  VIEW 1: DRAW YOUR CARD  ====================== -->
     <section class="view" id="view-draw" data-view="draw" role="tabpanel" aria-labelledby="tab-draw">
       <div class="container draw">
+
+        <div class="read-tip" id="readTip" hidden role="note" aria-labelledby="readTipTitle">
+          <h3 class="read-tip-title" id="readTipTitle">So liest du die Karten</h3>
+          <p>Auf vielen Karten stehen zwei Personen nebeneinander. <strong>Links</strong> siehst du eine <strong>Warnung</strong>, <strong>rechts</strong> ein <strong>Vorbild</strong>. Eine Warnung zeigt, was wir meiden sollen – nicht, wer ein Mensch insgesamt war. Lerne aus beiden und frage dich: Wo finde ich mich wieder?</p>
+          <button type="button" class="btn btn-ghost btn-sm" id="readTipOk">Verstanden</button>
+        </div>
 
         <div class="draw-stage" id="drawStage">
           <div class="deck" id="deck" aria-hidden="true"></div>      <!-- the face-down stack (built by JS) -->
@@ -1380,6 +1406,8 @@ html, body {
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </div>
+
+    <div class="vp-legend" id="viewerPair" hidden aria-label="Wie du die Karte liest"></div>
 
     <div class="vn-panel" id="viewerNotePanel" role="region" aria-labelledby="vnTitle" hidden></div>
 
@@ -2352,6 +2380,7 @@ window.COR_DEO_NOTES = {
 
     $("viewerTitle").textContent = model.title ? model.number + " · " + model.title : STR.card + " " + model.number;
     updateViewerNote(model);
+    updateViewerPair(model);
     var pos = visible.indexOf(viewerIndex);
     var total = visible.length || cards.length;
     $("viewerCount").textContent = (pos > -1 ? pos + 1 : model.number) + " " + STR.of + " " + total;
@@ -2362,6 +2391,20 @@ window.COR_DEO_NOTES = {
       var nb = neighbour(d);
       if (nb > -1 && nb !== viewerIndex) { (new Image()).src = cards[nb].front; (new Image()).src = cards[nb].back; }
     });
+  }
+
+  /** Legende unter der Karte: links Warnung, rechts Vorbild (nur Karten mit zwei Personen). */
+  function updateViewerPair(model) {
+    var box = $("viewerPair"), p = (window.COR_DEO_PAIRS || {})[model.number];
+    box.innerHTML = "";
+    if (!p) { box.hidden = true; return; }
+    function side(cls, label, name) {
+      var d = el("div", "vp-side " + cls), a = el("span", "vp-label"), b = el("span", "vp-name");
+      a.textContent = label; b.textContent = name; d.appendChild(a); d.appendChild(b); return d;
+    }
+    box.appendChild(side("is-warn", "◀ Links: Warnung", p.w));
+    box.appendChild(side("is-vor", "Rechts: Vorbild ▶", p.v));
+    box.hidden = false;
   }
 
   /** "Gedanke zur Karte": Knopf + Panel, nur für Karten mit Eintrag in COR_DEO_NOTES. */
@@ -2637,8 +2680,17 @@ window.COR_DEO_NOTES = {
     wireDraw();
     wireJourney();
     restoreToday();
+    setupReadTip();
     showView("draw", false);
     renderJourney();
+  }
+
+  /** Kurze Leseanleitung, die nur beim ersten Besuch erscheint (merkt sich "Verstanden" im Browser). */
+  function setupReadTip() {
+    var tip = $("readTip"), ok = $("readTipOk"), KEY2 = "cordeo:v1:readtip";
+    if (!tip || !ok) return;
+    if (A.store.get(KEY2) !== "1") tip.hidden = false;
+    ok.addEventListener("click", function () { tip.hidden = true; A.store.set(KEY2, "1"); });
   }
 
   var VIEWS = ["draw", "journey", "library", "game", "wille"];
@@ -3191,6 +3243,18 @@ window.COR_DEO_NOTES = {
     { n: 111, th: "Dankt in allen Dingen", w: "Die Israeliten in der Wüste", wr: "2. Mose 16,3", v: "Habakuk", vr: "Habakuk 3,17–18", q: "Kann ich heute sagen: „Aber ich will mich freuen“?" },
     { n: 117, th: "Bereitet zur ewigen Gemeinschaft", w: "Der reiche Jüngling", wr: "Matthäus 19,16–22", v: "Henoch", vr: "1. Mose 5,24; Hebräer 11,5", q: "Was hält mich zurück, Jesus ganz zu folgen und die ewige Gemeinschaft zu ergreifen?" }
   ];
+
+  /* Für das Großansicht-Fenster: Karte -> wer links (Warnung) und wer rechts (Vorbild) steht.
+     Aus GAME_DATA abgeleitet (n = Vorderseiten-Bild, Kartennummer = (n+1)/2); die Karte
+     „Barmherzigkeit" (Karte 36) gehört nicht zum Quiz und wird hier ergänzt. */
+  (function () {
+    var map = {};
+    GAME_DATA.forEach(function (d) {
+      [d.n].concat(d.also || []).forEach(function (n) { map[(n + 1) / 2] = { w: d.w, v: d.v }; });
+    });
+    map[36] = { w: "Älterer Sohn", v: "Jüngerer Sohn" };
+    window.COR_DEO_PAIRS = map;
+  })();
 
   var ROUND = 10;
   var BEST_KEY = "cordeo:game:best";
