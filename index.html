@@ -1141,6 +1141,29 @@ html, body {
 :root[data-theme="light"] .vp-side.is-warn .vp-label { color: #8f2f3a; }
 :root[data-theme="light"] .vp-side.is-vor .vp-label { color: #2f6a3a; }
 @media (max-height: 520px) { .vp-legend { display: none; } }
+
+/* ---- Drei Dimensionen (Karte 17): Schlüsselwörter unter der Karte ------------ */
+:root { --dim1: #f0c35a; --dim2: #7cc6f2; --dim3: #f59aab; }
+:root[data-theme="light"] { --dim1: #8a5a00; --dim2: #0b5c8a; --dim3: #a32040; }
+.dims { display: grid; gap: 7px; width: 100%; max-width: 380px; margin: 12px auto 0; text-align: left; }
+.dims[hidden] { display: none; }
+.dim-row { --c: var(--gold); display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: .95rem; line-height: 1.4; color: var(--text); animation: dimIn .35s ease both; }
+.dim-row[data-dim="1"] { --c: var(--dim1); }
+.dim-row[data-dim="2"] { --c: var(--dim2); }
+.dim-row[data-dim="3"] { --c: var(--dim3); }
+.dim-no { display: inline-grid; place-items: center; width: 1.5em; height: 1.5em; margin-top: .05em; border-radius: 50%; border: 2px solid var(--c); color: var(--c); font-weight: 700; font-size: .82em; line-height: 1; }
+.dim-word { color: var(--c); font-weight: 800; letter-spacing: .01em; }
+@keyframes dimIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dim-row { animation: none; } }
+.caption .dims { font-size: .8rem; margin-top: 8px; gap: 5px; }
+.caption .dim-row { font-size: .8rem; gap: 7px; }
+.hero-slot .dims { font-size: .9rem; }
+.viewer-dims { flex: none; width: auto; max-width: 440px; margin: 4px auto 0; padding: 4px var(--gutter) 6px; min-height: calc(2 * 1.4em + 20px); font-size: .86rem; }
+.viewer-dims .dim-row { gap: 8px; }
+.viewer-dims[hidden] { display: none; }
+.viewer.is-fit .viewer-dims { display: none; }
+@media (max-height: 520px) { .viewer-dims { display: none; } }
+.result-dims { margin-top: 4px; margin-bottom: 14px; margin-inline: 0; }
 </style>
 </head>
 
@@ -1225,6 +1248,7 @@ html, body {
             <p class="kicker" data-i18n="drawnToday">Deine Karte für heute</p>
             <h2 class="draw-title" id="resultTitle" tabindex="-1"></h2>
             <p class="draw-lead" data-i18n="tapToFlip"></p>
+            <div class="dims result-dims" id="resultDims" hidden aria-live="polite"></div>
 
             <label class="field-label" for="reflect" data-i18n="reflectLabel">Deine Reflexion</label>
             <textarea id="reflect" rows="4" maxlength="1200" data-i18n-placeholder="reflectPlaceholder" placeholder=""></textarea>
@@ -1408,6 +1432,7 @@ html, body {
     </div>
 
     <div class="vp-legend" id="viewerPair" hidden aria-label="Wie du die Karte liest"></div>
+    <div class="dims viewer-dims" id="viewerDims" hidden aria-live="polite"></div>
 
     <div class="vn-panel" id="viewerNotePanel" role="region" aria-labelledby="vnTitle" hidden></div>
 
@@ -1606,6 +1631,23 @@ window.COR_DEO_META = {
    Kurze Erklärung, die im Großansicht-Fenster hinter dem Knopf "Gedanke" erscheint.
    Schlüssel = Kartennummer. Weitere Karten einfach nach demselben Muster ergänzen.
    ---------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------
+   Schlüsselwörter unter einer Karte (nur Karten mit Eintrag).
+   front = was unter der Vorderseite steht, back = was unter der Rückseite steht.
+   n = Nummer der Dimension (1–3, bestimmt die Farbe), word = fettes Schlüsselwort.
+   ---------------------------------------------------------------------------- */
+window.COR_DEO_DIMS = {
+  17: {
+    front: [
+      { n: 1, word: "Gehorsam", text: "tun, was Gott bereits gesagt hat." },
+      { n: 2, word: "Orientierung", text: "suchen, wenn der Weg unklar ist." }
+    ],
+    back: [
+      { n: 3, word: "Hingabe", text: "sich ganz in Gottes Hände legen." }
+    ]
+  }
+};
+
 window.COR_DEO_NOTES = {
   57: {
     title: "Ein Tuch, viele Fäden",
@@ -2059,6 +2101,39 @@ window.COR_DEO_NOTES = {
   function setFlipped(card, on) {
     card.classList.toggle("is-flipped", on);
     card.setAttribute("aria-pressed", on ? "true" : "false");
+    try { card.dispatchEvent(new Event("cordeoflip")); } catch (e) { /* very old browser: text just stays */ }
+  }
+
+  /* ---- Schlüsselwörter unter der Karte (COR_DEO_DIMS) ----------------------- */
+  function dimsFor(model) { return (window.COR_DEO_DIMS || {})[model.number] || null; }
+
+  /** Fill `host` with the rows for the visible side (flipped = back). Hides it when there are none. */
+  function renderDims(host, model, flipped) {
+    if (!host) return;
+    var d = dimsFor(model), rows = d && d[flipped ? "back" : "front"];
+    host.innerHTML = "";
+    if (!rows || !rows.length) { host.hidden = true; return; }
+    rows.forEach(function (r) {
+      var row = el("div", "dim-row"), no = el("span", "dim-no"), tx = el("span", "dim-tx"), w = el("strong", "dim-word");
+      row.dataset.dim = r.n;
+      no.textContent = r.n; no.setAttribute("aria-hidden", "true");
+      w.textContent = r.word;
+      tx.appendChild(w); tx.appendChild(document.createTextNode(": " + r.text));
+      row.appendChild(no); row.appendChild(tx);
+      host.appendChild(row);
+    });
+    host.hidden = false;
+  }
+
+  /** Create the text box under a card (only for cards with an entry) and keep it in step with flips. */
+  function attachDims(card, model, host) {
+    if (!dimsFor(model)) return null;
+    var box = el("div", "dims");
+    box.setAttribute("aria-live", "polite");
+    host.appendChild(box);
+    renderDims(box, model, isFlipped(card));
+    card.addEventListener("cordeoflip", function () { renderDims(box, model, isFlipped(card)); });
+    return box;
   }
   function toggleFlip(card) { setFlipped(card, !isFlipped(card)); }
 
@@ -2077,6 +2152,7 @@ window.COR_DEO_NOTES = {
       var num = el("span", "num"); num.textContent = pad2(model.number);
       cap.appendChild(num);
       if (model.title) { var nm = el("span", "name"); nm.textContent = model.title; nm.title = model.title; cap.appendChild(nm); }
+      attachDims(card, model, cap);
 
       var exp = el("button", "expand-btn", { type: "button" });
       exp.setAttribute("aria-label", fmt(STR.openLarge, { name: model.name }));
@@ -2238,7 +2314,9 @@ window.COR_DEO_NOTES = {
 
     var slot = $("heroSlot");
     slot.innerHTML = "";
-    slot.appendChild(buildCard(model, { eager: true, onOpen: function (i) { openViewer(i); } }));
+    var heroCard = buildCard(model, { eager: true, onOpen: function (i) { openViewer(i); } });
+    slot.appendChild(heroCard);
+    attachDims(heroCard, model, slot);
 
     $("heroTitle").textContent = model.title ? model.title : STR.card + " " + model.number;
     var locale = CFG.lang || undefined;
@@ -2423,6 +2501,11 @@ window.COR_DEO_NOTES = {
   function updateViewerFace() {
     var flipped = $("viewerInner").classList.contains("is-flipped");
     $("viewerFace").textContent = flipped ? STR.back : STR.front;
+    var m = cards[viewerIndex];
+    if (m) {
+      renderDims($("viewerDims"), m, flipped);
+      requestAnimationFrame(fitViewerCard);       // the text area may have changed the free height
+    }
   }
 
   function flipViewer() {
@@ -2612,7 +2695,8 @@ window.COR_DEO_NOTES = {
     // Small public API used by js/journey.js (draw page, journal, tree)
     window.CorDeoApp = {
       cards: cards, CFG: CFG, STR: STR, fmt: fmt, el: el, store: store, pad2: pad2,
-      buildCard: buildCard, openViewer: openViewer, highlight: highlight, loadFace: loadFace
+      buildCard: buildCard, openViewer: openViewer, highlight: highlight, loadFace: loadFace,
+      renderDims: renderDims, isFlipped: isFlipped
     };
 
     // Initial state of the filter
@@ -2894,8 +2978,11 @@ window.COR_DEO_NOTES = {
     var slot = $("drawSlot");
     slot.innerHTML = "";
     var wrap = A.el("div", "slot-card" + (animate ? " is-revealing" : ""));
-    wrap.appendChild(A.buildCard(model, { eager: true, onOpen: function (i) { A.openViewer(i); } }));
+    var drawnCard = A.buildCard(model, { eager: true, onOpen: function (i) { A.openViewer(i); } });
+    wrap.appendChild(drawnCard);
     slot.appendChild(wrap);
+    A.renderDims($("resultDims"), model, A.isFlipped(drawnCard));
+    drawnCard.addEventListener("cordeoflip", function () { A.renderDims($("resultDims"), model, A.isFlipped(drawnCard)); });
 
     var title = model.title ? model.title : STR.card + " " + model.number;
     $("resultTitle").textContent = title;
@@ -2914,6 +3001,7 @@ window.COR_DEO_NOTES = {
     var deck = $("deck");
     deck.classList.remove("is-lifting", "is-gone", "is-shuffling");
     $("drawSlot").innerHTML = "";
+    $("resultDims").innerHTML = ""; $("resultDims").hidden = true;
     $("drawResult").hidden = true;
     $("drawIdle").hidden = false;
     $("reflect").value = "";
