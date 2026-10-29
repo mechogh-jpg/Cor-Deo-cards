@@ -7,8 +7,8 @@ Aufruf (nach jedem Neubau mit build-single-file.py):
 Das Skript ist idempotent: läuft es zweimal, passiert beim zweiten Mal nichts.
 Es ergänzt nur
   - im <head>:  manifest, Icons und iPhone-Meta-Tags
-  - vor </body>: <script src="pwa.js"></script>
-Die Dateien manifest.json, sw.js, pwa.js und der Ordner icons/ müssen im Repository neben index.html liegen.
+  - vor </body>: <script src="pwa.js"></script> und <script src="share.js"></script> (Teilen-Button mit QR-Code)
+Die Dateien manifest.json, sw.js, pwa.js, share.js, share-qr.svg, share-qr.png und der Ordner icons/ müssen im Repository neben index.html liegen.
 """
 import sys
 
@@ -24,6 +24,7 @@ HEAD = '''  <meta name="theme-color" content="#070a1a">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">'''
 HEAD_ANCHOR = '  <meta name="theme-color" content="#070a1a">'
 BODY = '  <!-- App-Installation (PWA) -->\n  <script src="pwa.js"></script>\n</body>'
+SHARE_BODY = '  <!-- Teilen: Button + QR-Code -->\n  <script src="share.js"></script>\n</body>'
 
 
 def main(path):
@@ -38,6 +39,11 @@ def main(path):
         if html.count("</body>") != 1:
             sys.exit("Fehler: </body> nicht eindeutig gefunden – bitte manuell einfügen.")
         html = html.replace("</body>", BODY, 1)
+        changed = True
+    if 'src="share.js"' not in html:
+        if html.count("</body>") != 1:
+            sys.exit("Fehler: </body> nicht eindeutig gefunden – bitte manuell einfügen.")
+        html = html.replace("</body>", SHARE_BODY, 1)
         changed = True
     if changed:
         open(path, "w", encoding="utf-8").write(html)
