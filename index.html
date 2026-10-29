@@ -218,6 +218,49 @@ html, body {
 }
 .tagline:empty { display: none; }
 
+/* Leitvers: ruhig, buchartig, deutlich leiser als der Titel */
+.leitvers {
+  margin: clamp(18px, 3.4vw, 28px) auto 0;
+  max-width: 30rem;
+  padding-inline: 4px;
+  animation: leitversIn 1s var(--ease) .25s both;
+}
+.lv-text { margin: 0; }
+.lv-text p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.28rem, 3.6vw, 1.8rem);
+  line-height: 1.32;
+  letter-spacing: .005em;
+  color: var(--text);
+  text-wrap: balance;
+  hanging-punctuation: first;
+  font-kerning: normal;
+  font-feature-settings: "kern", "liga", "dlig";
+  text-shadow: 0 0 34px rgba(216, 180, 90, .16);
+}
+.lv-cite {
+  margin-top: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-ui);
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: .24em; text-transform: uppercase;
+}
+.lv-ref { color: var(--gold); }
+.lv-src { color: var(--text-muted); font-weight: 500; }
+.lv-dot {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--gold); opacity: .7;
+}
+:root[data-theme="light"] .lv-ref { color: var(--gold-deep); }
+:root[data-theme="light"] .lv-text p { text-shadow: none; }
+@keyframes leitversIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
 .ornament {
   display: flex; align-items: center; justify-content: center; gap: 12px;
   margin-top: 18px;
@@ -1181,6 +1224,19 @@ html, body {
       </svg>
       <h1 class="title" id="deckTitle">COR DEO</h1>
       <p class="tagline" id="deckTagline"></p>
+
+      <!-- Leitvers (Schlachter 2000). Text hier direkt änderbar. -->
+      <figure class="leitvers" id="leitvers">
+        <blockquote class="lv-text" lang="de" cite="https://www.bibleserver.com/SLT/R%C3%B6mer8,29">
+          <p>„…&#8239;dem Ebenbild seines Sohnes gleichgestaltet zu werden“</p>
+        </blockquote>
+        <figcaption class="lv-cite">
+          <span class="lv-ref" id="leitversRef">Römer 8,29</span>
+          <span class="lv-dot" aria-hidden="true"></span>
+          <span class="lv-src">Schlachter 2000</span>
+        </figcaption>
+      </figure>
+
       <div class="ornament" aria-hidden="true"><span></span><i></i><span></span></div>
     </header>
 
@@ -2683,6 +2739,8 @@ window.COR_DEO_NOTES = {
     // Header texts + page title
     $("deckTitle").textContent = CFG.deckTitle;
     $("deckTagline").textContent = CFG.tagline || "";
+    // Bibelstellen-Angabe unter dem Leitvers: Verszählung je nach Oberflächensprache
+    if ($("leitversRef")) $("leitversRef").textContent = CFG.uiLang === "en" ? "Romans 8:29" : "Römer 8,29";
     document.title = CFG.deckTitle + (CFG.tagline ? " — " + CFG.tagline : "");
     $("footerText").textContent = fmt(STR.footer, { title: CFG.deckTitle, total: cards.length });
     if (noticeHtml) { $("notice").innerHTML = noticeHtml; $("notice").hidden = false; }
