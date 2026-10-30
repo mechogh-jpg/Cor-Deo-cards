@@ -1151,6 +1151,9 @@ html, body {
   .wl-heart-fill { transition: none; }
 }
 .credit-line { margin: 10px 0 0; font-size: .78rem; letter-spacing: .04em; font-style: italic; opacity: .85; }
+.footer-mail { font-style: normal; font-size: .85rem; }
+.footer-mail a { color: var(--gold, #d4af37); text-decoration: none; border-bottom: 1px solid rgba(212,175,55,.4); padding: .25rem 0; word-break: break-all; }
+.footer-mail a:hover, .footer-mail a:focus-visible { border-bottom-color: currentColor; }
 
 /* ---- Gedanke zur Karte (im Großansicht-Fenster) ------------------------------ */
 .vn-panel {
@@ -1434,6 +1437,7 @@ html, body {
       <div class="ornament" aria-hidden="true"><span></span><i></i><span></span></div>
       <p id="footerText"></p>
       <p class="credit-line" id="creditLine"></p>
+      <p class="credit-line footer-mail"><a id="footerMail" href="#" target="_blank" rel="noopener nofollow" aria-label="E-Mail an Michael Ghaly">E-Mail</a></p>
     </footer>
 
     <noscript><p class="notice" style="margin:2rem auto;max-width:36rem">Please enable JavaScript to view the card deck.</p></noscript>
@@ -4179,5 +4183,14 @@ window.COR_DEO_NOTES = {
   <script src="pwa.js"></script>
   <!-- Teilen: Button + QR-Code -->
   <script src="share.js"></script>
+  <!-- Footer e-mail: assembled by script so simple spam bots don't harvest it -->
+  <script>
+    (function () {
+      try {
+        var a = document.getElementById('footerMail');
+        if (a) { var addr = ['mechogh', 'protonmail.com'].join('@'); a.href = 'mailto:' + addr; a.textContent = '\u2709 ' + addr; }
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>
