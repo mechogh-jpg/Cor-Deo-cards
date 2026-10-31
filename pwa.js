@@ -28,9 +28,11 @@
       frameText: "Öffne COR DEO in einem eigenen Tab und installiere es dort als App: Symbol auf dem Startbildschirm, ohne langen Link.",
       frameBtn: "Als App öffnen", install: "Installieren", howto: "So geht’s", hide: "Anleitung ausblenden",
       close: "Schließen", footer: "App installieren", region: "COR DEO installieren",
-      ios: ["Tippe unten auf das Teilen-Symbol " + SHARE + ".", "Scrolle und wähle „Zum Home-Bildschirm“.", "Tippe oben rechts auf „Hinzufügen“."],
+      segLabel: "Gerät wählen", segAndroid: "Android", segIos: "iPhone",
+      iosHint: "Je nach iOS-Version liegt das Teilen-Symbol auch im Menü ⋯ neben der Adressleiste.",
+      ios: ["Öffne den Link in Safari und tippe unten auf das Teilen-Symbol " + SHARE + ".", "Scrolle und wähle „Zum Home-Bildschirm“.", "Tippe oben rechts auf „Hinzufügen“."],
       iosWebview: "Du hast den Link in einer anderen App geöffnet (z. B. WhatsApp). Öffne ihn zuerst in Safari: Tippe auf Teilen bzw. ⋯ und wähle „In Safari öffnen“. Danach:",
-      android: ["Tippe oben rechts auf das Menü ⋮.", "Wähle „App installieren“ (oder „Zum Startbildschirm hinzufügen“).", "Bestätige mit „Installieren“."],
+      android: ["Öffne den Link in Chrome und tippe oben rechts auf das Menü ⋮.", "Wähle „App installieren“ (oder „Zum Startbildschirm hinzufügen“).", "Bestätige mit „Installieren“."],
       androidWebview: "Du hast den Link in einer anderen App geöffnet (z. B. WhatsApp)? Tippe auf ⋮ und wähle „Im Browser öffnen“ bzw. „In Chrome öffnen“. Danach:",
       other: ["Öffne das Browser-Menü.", "Wähle „App installieren“ oder „Zum Startbildschirm hinzufügen“."],
       done: "COR DEO wurde installiert – das Symbol findest du auf deinem Startbildschirm.",
@@ -44,9 +46,11 @@
       frameText: "Open COR DEO in its own tab and install it there as an app: an icon on your home screen, no long link.",
       frameBtn: "Open as app", install: "Install", howto: "How to", hide: "Hide steps",
       close: "Close", footer: "Install app", region: "Install COR DEO",
-      ios: ["Tap the Share icon " + SHARE + " at the bottom.", "Scroll and choose “Add to Home Screen”.", "Tap “Add” at the top right."],
+      segLabel: "Choose device", segAndroid: "Android", segIos: "iPhone",
+      iosHint: "Depending on your iOS version, the Share icon may also sit in the ⋯ menu next to the address bar.",
+      ios: ["Open the link in Safari and tap the Share icon " + SHARE + " at the bottom.", "Scroll and choose “Add to Home Screen”.", "Tap “Add” at the top right."],
       iosWebview: "You opened the link inside another app (e.g. WhatsApp). Open it in Safari first: tap Share or ⋯ and choose “Open in Safari”. Then:",
-      android: ["Tap the menu ⋮ at the top right.", "Choose “Install app” (or “Add to Home screen”).", "Confirm with “Install”."],
+      android: ["Open the link in Chrome and tap the menu ⋮ at the top right.", "Choose “Install app” (or “Add to Home screen”).", "Confirm with “Install”."],
       androidWebview: "Opened the link inside another app (e.g. WhatsApp)? Tap ⋮ and choose “Open in browser” or “Open in Chrome”. Then:",
       other: ["Open the browser menu.", "Choose “Install app” or “Add to Home screen”."],
       done: "COR DEO is installed – you will find the icon on your home screen.",
@@ -136,7 +140,10 @@
       "background:transparent;color:var(--text-muted);cursor:pointer}" +
     ".pwa-x:hover{background:var(--surface);color:var(--text)}" +
     ".pwa-link{background:none;border:0;padding:6px 8px;color:var(--gold);font:inherit;letter-spacing:inherit;text-decoration:underline;cursor:pointer}" +
-    ".pwa-open{text-decoration:none}";
+    ".pwa-open{text-decoration:none}" +
+    ".pwa-seg{display:flex;gap:4px;margin-top:10px;padding:3px;background:var(--surface);border-radius:10px}" +
+    ".pwa-seg button{flex:1;min-height:36px;border:0;border-radius:8px;background:transparent;color:var(--text-muted);font:inherit;font-size:.9rem;cursor:pointer}" +
+    ".pwa-seg button[aria-pressed=\"true\"]{background:var(--gold);color:#1a1400;font-weight:600}";
   document.head.appendChild(css);
 
   /* ---------- 6. Karte aufbauen ---------- */
@@ -149,6 +156,10 @@
       '<div class="pwa-body">' +
         '<strong class="pwa-title">' + S.title + '</strong>' +
         '<p class="pwa-text"></p>' +
+        '<div class="pwa-seg" role="group" aria-label="' + S.segLabel + '" hidden>' +
+          '<button type="button" data-p="android" aria-pressed="false">' + S.segAndroid + '</button>' +
+          '<button type="button" data-p="ios" aria-pressed="false">' + S.segIos + '</button>' +
+        '</div>' +
         '<p class="pwa-note" hidden></p>' +
         '<ol class="pwa-steps" hidden></ol>' +
         '<div class="pwa-actions">' +
@@ -165,14 +176,18 @@
   var $ = function (sel) { return wrap.querySelector(sel); };
   var elText = $(".pwa-text"), elNote = $(".pwa-note"), elSteps = $(".pwa-steps"),
       btnOpen = $(".pwa-open"), btnInstall = $(".pwa-install"), btnHowto = $(".pwa-howto"),
-      btnX = $(".pwa-x");
+      btnX = $(".pwa-x"), elSeg = $(".pwa-seg"), segBtns = wrap.querySelectorAll(".pwa-seg button");
 
   var deferred = null;          // Android: gespeichertes beforeinstallprompt-Ereignis
   var stepsOpen = false;
+  var plat = isIOS ? "ios" : (isAndroid ? "android" : "other");   // Gerät, dessen Schritte gerade gezeigt werden (umschaltbar)
+  var forced = params.get("install") === "1";
 
   function fillSteps() {
-    var list = isIOS ? S.ios : (isAndroid ? S.android : S.other);
-    var note = isIOS ? (iosWebview ? S.iosWebview : "") : (androidWebview ? S.androidWebview : "");
+    var list = plat === "ios" ? S.ios : (plat === "android" ? S.android : S.other);
+    var note = "";
+    if (plat === "ios") note = (isIOS && iosWebview) ? S.iosWebview : S.iosHint;
+    else if (plat === "android" && isAndroid && androidWebview) note = S.androidWebview;
     elSteps.innerHTML = "";
     list.forEach(function (t) { var li = document.createElement("li"); li.innerHTML = t; elSteps.appendChild(li); });
     elNote.textContent = note;
@@ -185,20 +200,24 @@
       elText.textContent = S.frameText;
       btnOpen.textContent = S.frameBtn;
       btnOpen.href = location.origin + location.pathname + "?install=1";
-      btnOpen.hidden = false; btnInstall.hidden = true; btnHowto.hidden = true;
+      btnOpen.hidden = false; btnInstall.hidden = true; btnHowto.hidden = true; elSeg.hidden = true;
       elSteps.hidden = true; elNote.hidden = true;
       return;
     }
     elText.textContent = S.text;
     btnOpen.hidden = true;
-    if (deferred) {                                   // Android/Chrome: direkt installieren
+    elSeg.hidden = !(stepsOpen || forced);              // Geräte-Umschalter: nur in der Anleitung bzw. beim Start per QR-Link
+    segBtns.forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-p") === plat ? "true" : "false"); });
+    if (deferred && plat === "android") {             // Android/Chrome: direkt installieren
       btnInstall.hidden = false; btnHowto.hidden = true;
       elSteps.hidden = true; elNote.hidden = true;
       return;
     }
     btnInstall.hidden = true; btnHowto.hidden = false;  // iPhone & Co.: Anleitung
+    if (forced) stepsOpen = true;                       // vom QR-Link: Schritte stehen sofort da
     fillSteps();
     elSteps.hidden = !stepsOpen;
+    btnHowto.hidden = forced;
     btnHowto.textContent = stepsOpen ? S.hide : S.howto;
   }
 
@@ -233,11 +252,16 @@
     });
   });
   btnHowto.addEventListener("click", function () { stepsOpen = !stepsOpen; render(); });
+  segBtns.forEach(function (b) {
+    b.addEventListener("click", function () { plat = b.getAttribute("data-p"); stepsOpen = true; render(); });
+  });
   btnX.addEventListener("click", dismiss);
 
   /* ---------- 8. Einbauen ---------- */
   var tabbar = document.getElementById("tabbar");
-  if (tabbar && tabbar.parentNode) tabbar.parentNode.insertBefore(wrap, tabbar);
+  var appRoot = document.getElementById("app");
+  if (forced && !inFrame && appRoot) appRoot.insertBefore(wrap, appRoot.firstChild);   // vom QR-Link: ganz oben
+  else if (tabbar && tabbar.parentNode) tabbar.parentNode.insertBefore(wrap, tabbar);
   else document.body.insertBefore(wrap, document.body.firstChild);
 
   // dauerhafter kleiner Link im Fuß der Seite
@@ -250,7 +274,6 @@
     p.appendChild(b); foot.parentNode.insertBefore(p, foot.nextSibling);
   }
 
-  var forced = params.get("install") === "1";
   if (forced && !inFrame) stepsOpen = true;
   if (forced || Date.now() > getHide()) show(false);
 })();

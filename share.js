@@ -19,6 +19,9 @@
   /* Direkte Adresse der App (GitHub Pages) – nicht die Google-Sites-Adresse und nicht location.href,
      denn im Google-Sites-Rahmen lässt sich die App nicht installieren. */
   var APP_URL = "https://mechogh-jpg.github.io/Cor-Deo-cards/";
+  /* Kopieren und Teilen verwenden dieselbe Adresse wie der QR-Code (mit ?install=1),
+     damit auch dort sofort die Installationsschritte für das eigene Gerät erscheinen. */
+  var SHARE_URL = APP_URL + "?install=1";
 
   var T = {
     de: {
@@ -28,7 +31,10 @@
       qrAlt: "QR-Code, der COR DEO auf dem Handy öffnet",
       copy: "Link kopieren", share: "Teilen …", save: "QR-Code speichern",
       copied: "Link kopiert ✓", copyFail: "Kopieren nicht möglich – bitte den Link unten markieren.",
-      close: "Schließen", shareText: "COR DEO – interaktives Kartenset für Gebet und Reflexion"
+      close: "Schließen", shareText: "COR DEO – interaktives Kartenset für Gebet und Reflexion",
+      howTitle: "So kommt COR DEO auf den Startbildschirm",
+      howAndroid: "<b>Android:</b> Link in Chrome öffnen, dann Menü ⋮ → „Zum Startbildschirm hinzufügen“.",
+      howIos: "<b>iPhone:</b> Link in Safari öffnen, dann Teilen-Symbol → „Zum Home-Bildschirm“."
     },
     en: {
       btn: "Share", btnLabel: "Share COR DEO – QR code and link",
@@ -37,7 +43,10 @@
       qrAlt: "QR code that opens COR DEO on a phone",
       copy: "Copy link", share: "Share …", save: "Save QR code",
       copied: "Link copied ✓", copyFail: "Copying not possible – please select the link below.",
-      close: "Close", shareText: "COR DEO – interactive card deck for prayer and reflection"
+      close: "Close", shareText: "COR DEO – interactive card deck for prayer and reflection",
+      howTitle: "How to put COR DEO on your home screen",
+      howAndroid: "<b>Android:</b> open the link in Chrome, then menu ⋮ → “Add to Home screen”.",
+      howIos: "<b>iPhone:</b> open the link in Safari, then the Share icon → “Add to Home Screen”."
     }
   };
   var cfg = window.COR_DEO_CONFIG || {};
@@ -65,6 +74,9 @@
     ".share-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}" +
     ".share-msg{min-height:1.2em;margin:4px 0 0;font-size:.9rem;color:var(--gold-bright)}" +
     ".share-save{display:inline-block;margin-top:2px;padding:6px 8px;color:var(--gold);font-size:.85rem;text-decoration:underline}" +
+    ".share-how{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);text-align:left;font-size:.85rem;color:var(--text-muted)}" +
+    ".share-how-title{display:block;margin-bottom:4px;color:var(--text);font-weight:600}" +
+    ".share-how p{margin:4px 0}.share-how b{color:var(--gold-bright);font-weight:600}" +
     ".share-x{position:absolute;top:8px;right:8px;width:38px;height:38px;display:grid;place-items:center;border:0;border-radius:50%;" +
       "background:transparent;color:var(--text-muted);cursor:pointer}" +
     ".share-x:hover{background:var(--surface);color:var(--text)}" +
@@ -97,7 +109,7 @@
   function copyLink() {
     function fallback() {
       var ta = document.createElement("textarea");
-      ta.value = APP_URL; ta.setAttribute("readonly", "");
+      ta.value = SHARE_URL; ta.setAttribute("readonly", "");
       ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
       dlg.appendChild(ta); ta.select();
       var ok = false; try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
@@ -105,12 +117,12 @@
       say(ok ? S.copied : S.copyFail);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(APP_URL).then(function () { say(S.copied); }, fallback);
+      navigator.clipboard.writeText(SHARE_URL).then(function () { say(S.copied); }, fallback);
     } else fallback();
   }
 
   function nativeShare() {
-    navigator.share({ title: "COR DEO", text: S.shareText, url: APP_URL }).catch(function () { /* abgebrochen */ });
+    navigator.share({ title: "COR DEO", text: S.shareText, url: SHARE_URL }).catch(function () { /* abgebrochen */ });
   }
 
   function build() {
@@ -129,6 +141,8 @@
         '</div>' +
         '<a class="share-save" href="share-qr.png" download="COR-DEO-QR.png">' + S.save + '</a>' +
         '<p class="share-msg" role="status" aria-live="polite"></p>' +
+        '<div class="share-how"><span class="share-how-title">' + S.howTitle + '</span>' +
+          '<p>' + S.howAndroid + '</p><p>' + S.howIos + '</p></div>' +
         '<button type="button" class="share-x" aria-label="' + S.close + '">' +
           '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
         '</button>' +
