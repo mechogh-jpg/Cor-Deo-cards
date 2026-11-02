@@ -16,8 +16,8 @@
   /* ---------- Hier die Angaben eintragen ---------- */
   var LEGAL = {
     name: "Michael Ghaly",
-    street: "[Straße und Hausnummer]",
-    city: "[PLZ Ort]",
+    street: "Weißkopfstraße 24",
+    city: "86343 Königsbrunn",
     country: "Deutschland",
     mailUser: "mechogh",
     mailHost: "protonmail.com",
@@ -46,6 +46,8 @@
         "<p>Konzept, Gestaltung, Kartenbilder und Texte von COR DEO stammen von " + LEGAL.name + ". " +
         "Eine Verwendung außerhalb dieser Anwendung, insbesondere die Vervielfältigung oder Weitergabe der Karten, " +
         "ist nur mit vorheriger Zustimmung gestattet.</p>" +
+        "<h3>Bibeltext</h3>" +
+        "<p>Bibelstellen auf den Karten: Schlachter 2000, © 2000 Genfer Bibelgesellschaft.</p>" +
         "<h3>Haftung für Links</h3>" +
         "<p>Diese Anwendung enthält keine bewusst gesetzten Links auf fremde Inhalte. Sollten Sie dennoch auf einen " +
         "problematischen Verweis stoßen, bitte ich um einen kurzen Hinweis per E-Mail.</p>"
