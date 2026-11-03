@@ -1500,6 +1500,7 @@ html, body {
   <p class="sr-only" id="live" aria-live="polite"></p>
 
   <!-- Load order matters: data first, then the app. -->
+  <script src="card-text.js"></script>
   <script>
 /* ============================================================================
    COR DEO — DECK DATA & SETTINGS
@@ -1964,7 +1965,7 @@ window.COR_DEO_NOTES = {
         title: title,
         name: name,
         // Everything the search box looks at, accent-folded:
-        haystack: fold([STR.card, "card", "no", number, title, (m.keywords || []).join(" ")].join(" "))
+        haystack: fold([STR.card, "card", "no", number, title, (m.keywords || []).join(" "), (window.COR_DEO_TEXT || {})[number] || ""].join(" "))
       });
     }
   }

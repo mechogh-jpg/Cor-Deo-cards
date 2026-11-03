@@ -6,11 +6,11 @@
      sodass ein Update der Seite (VERSION erhöhen) die ~7,6 MB nicht erneut herunterlädt.
    - Fremde Adressen werden nicht angefasst (die Schriften liegen im Ordner fonts/ und werden wie Bilder aus dem Cache bedient).
    Bei Änderungen an diesem Skript: VERSION erhöhen. Bei neuen/geänderten Kartenbildern: IMG_CACHE erhöhen. */
-var VERSION = "cordeo-v6";
+var VERSION = "cordeo-v7";
 var IMG_CACHE = "cordeo-img-v2";
 var CARD_COUNT = 120;                       // Anzahl der Bilddateien "COR DEO-Karten-001.jpg" … "-120.jpg"
 var PRECACHE_PARALLEL = 4;
-var SHELL = ["./", "index.html", "manifest.json", "pwa.js", "share.js", "legal.js", "fonts/fonts.css", "share-qr.svg", "share-qr.png",
+var SHELL = ["./", "index.html", "manifest.json", "pwa.js", "share.js", "legal.js", "card-text.js", "fonts/fonts.css", "share-qr.svg", "share-qr.png",
              "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/favicon-32.png"];
 
 self.addEventListener("install", function (e) {
@@ -36,7 +36,7 @@ self.addEventListener("fetch", function (e) {
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return;           // nur eigene Dateien
 
-  var isPage = req.mode === "navigate" || /(^|\/)(index\.html)?$/.test(url.pathname) || /(pwa|share|legal)\.js$/.test(url.pathname);
+  var isPage = req.mode === "navigate" || /(^|\/)(index\.html)?$/.test(url.pathname) || /(pwa|share|legal|card-text)\.js$/.test(url.pathname);
 
   if (isPage) {                                              // Netzwerk zuerst
     e.respondWith(
