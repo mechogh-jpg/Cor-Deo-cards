@@ -1965,6 +1965,10 @@ window.COR_DEO_NOTES = {
         title: title,
         name: name,
         // Everything the search box looks at, accent-folded:
+        // Separate parts, used only to rank search results (title > keywords > card text):
+        fTitle: fold(title),
+        fKw: fold((m.keywords || []).join(" ")),
+        fText: fold((window.COR_DEO_TEXT || {})[number] || ""),
         haystack: fold([STR.card, "card", "no", number, title, (m.keywords || []).join(" "), (window.COR_DEO_TEXT || {})[number] || ""].join(" "))
       });
     }
@@ -2260,17 +2264,45 @@ window.COR_DEO_NOTES = {
     return function (m) { return words.every(function (w) { return m.haystack.indexOf(w) > -1; }); };
   }
 
+  /** Relevance for free-text searches: a word in the title counts most, then keywords, then the text on the card.
+      Returns null for number searches and an empty box (then the original card order is kept). */
+  function scorer(query) {
+    var q = fold(query).trim();
+    if (!q) return null;
+    var cleaned = q.replace(/(card|no\.?|nr\.?|#)/g, " ").trim();
+    if (/^[\d\s,\-–]+$/.test(cleaned) && /\d/.test(cleaned)) return null;
+    var words = q.split(/\s+/);
+    return function (m) {
+      var sc = 0;
+      words.forEach(function (w) {
+        if (m.fTitle.indexOf(w) > -1) sc += 4;
+        if (m.fKw.indexOf(w) > -1) sc += 2;
+        if (m.fText.indexOf(w) > -1) sc += 1;
+      });
+      return sc;
+    };
+  }
+
   function applySearch() {
     var input = $("search");
     var q = input.value;
     $("searchClear").hidden = !q;
     var test = matcher(q);
+    var score = scorer(q);
 
-    visible = [];
+    var hits = [];
     gridCards.forEach(function (g) {
       var ok = test(g.model);
       g.item.hidden = !ok;
-      if (ok) visible.push(g.model.index);
+      g.item.style.order = "";
+      if (ok) hits.push({ g: g, sc: score ? score(g.model) : 0 });
+    });
+    // best matches first; equal scores keep the original card order
+    if (score) hits.sort(function (x, y) { return (y.sc - x.sc) || (x.g.model.index - y.g.model.index); });
+    visible = [];
+    hits.forEach(function (h, i) {
+      if (score) h.g.item.style.order = String(i);
+      visible.push(h.g.model.index);
     });
 
     $("empty").hidden = visible.length > 0;
