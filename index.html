@@ -1345,8 +1345,11 @@ html, body {
           <h2 class="journal-title" data-i18n="journalTitle">Mein Tagebuch</h2>
           <div class="journal-actions">
             <button type="button" class="btn btn-ghost btn-sm" id="copyAll" data-i18n="copyAll">Alles kopieren</button>
-            <button type="button" class="btn btn-ghost btn-sm" id="saveFile" data-i18n="saveFile">Als Datei sichern</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="saveFile" data-i18n="saveFile">Als Text speichern</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="backupBtn" data-i18n="backupBtn">Sicherung speichern</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="restoreBtn" data-i18n="restoreBtn">Sicherung laden</button>
             <button type="button" class="btn btn-ghost btn-sm" id="resetAll" data-i18n="resetAll">Alles zurücksetzen</button>
+            <input type="file" id="restoreFile" accept=".json,application/json" hidden>
           </div>
         </div>
         <p class="status-msg" id="journalMsg" role="status"></p>
@@ -1791,10 +1794,10 @@ window.COR_DEO_NOTES = {
       phaseNote2: "Roots are deepening. God is shaping you.", phaseNote3: "Your tree is bearing fruit.", phaseNote4: "A tree planted by streams of water. Stay faithful.",
       nextPhase: "{n} more days until “{name}”", nextPhaseOne: "1 more day until “{name}”", maxPhase: "You have reached the highest phase — keep walking.",
       graceMsg: "Missed a few days? “His mercies are new every morning.” (Lam 3:23) Draw a card and begin again.",
-      storageWarn: "This browser does not allow saving — your progress will be lost when you close the page. Use “Save as file” to keep your notes.",
+      storageWarn: "This browser does not allow saving — your progress will be lost when you close the page. Use “Save backup” to keep your notes.",
       journalTitle: "My Journal", journalEmpty: "No entries yet. Draw your first card and write down what God shows you.",
-      goDraw: "Draw a card", copyAll: "Copy all", saveFile: "Save as file", resetAll: "Reset everything",
-      resetConfirm: "Really delete everything? Click again.", copied: "Copied.", copyFail: "Copying was not possible here.",
+      goDraw: "Draw a card", copyAll: "Copy all", saveFile: "Save as text", resetAll: "Reset everything",
+      resetConfirm: "Really delete everything? Click again.", backupBtn: "Save backup", restoreBtn: "Load backup", backupDone: "Backup saved. Keep the file safe (e.g. in your cloud storage).", restoreDone: "Backup loaded: {n} new notes added.", restoreBad: "This file is not a COR DEO backup.", copied: "Copied.", copyFail: "Copying was not possible here.",
       deleteEntry: "Delete entry", noNote: "(no note)", journalHeading: "COR DEO – My Journal", openCard: "Open card"
     },
     de: {
@@ -1828,10 +1831,10 @@ window.COR_DEO_NOTES = {
       phaseNote2: "Die Wurzeln gehen tiefer. Gott formt dich.", phaseNote3: "Dein Baum trägt Frucht.", phaseNote4: "Ein Baum an Wasserbächen gepflanzt. Bleib treu.",
       nextPhase: "Noch {n} Tage bis „{name}“", nextPhaseOne: "Noch 1 Tag bis „{name}“", maxPhase: "Du hast die höchste Phase erreicht – geh weiter.",
       graceMsg: "Ein paar Tage verpasst? „Seine Gnade ist jeden Morgen neu.“ (Klgl 3,23) Ziehe eine Karte und fang neu an.",
-      storageWarn: "Dieser Browser erlaubt kein Speichern – dein Fortschritt geht beim Schließen verloren. Sichere deine Notizen mit „Als Datei sichern“.",
+      storageWarn: "Dieser Browser erlaubt kein Speichern – dein Fortschritt geht beim Schließen verloren. Sichere deine Notizen mit „Sicherung speichern“.",
       journalTitle: "Mein Tagebuch", journalEmpty: "Noch keine Einträge. Ziehe deine erste Karte und schreibe auf, was Gott dir zeigt.",
-      goDraw: "Karte ziehen", copyAll: "Alles kopieren", saveFile: "Als Datei sichern", resetAll: "Alles zurücksetzen",
-      resetConfirm: "Wirklich alles löschen? Noch einmal klicken.", copied: "Kopiert.", copyFail: "Kopieren war hier nicht möglich.",
+      goDraw: "Karte ziehen", copyAll: "Alles kopieren", saveFile: "Als Text speichern", resetAll: "Alles zurücksetzen",
+      resetConfirm: "Wirklich alles löschen? Noch einmal klicken.", backupBtn: "Sicherung speichern", restoreBtn: "Sicherung laden", backupDone: "Sicherung gespeichert. Bewahre die Datei gut auf (z. B. in deiner Cloud).", restoreDone: "Sicherung geladen: {n} neue Einträge hinzugefügt.", restoreBad: "Diese Datei ist keine COR DEO-Sicherung.", copied: "Kopiert.", copyFail: "Kopieren war hier nicht möglich.",
       deleteEntry: "Eintrag löschen", noNote: "(ohne Notiz)", journalHeading: "COR DEO – Mein Tagebuch", openCard: "Karte öffnen"
     }
   };
@@ -3154,6 +3157,9 @@ window.COR_DEO_NOTES = {
     $("copyAll").addEventListener("click", copyAll);
     $("saveFile").addEventListener("click", saveFile);
     $("resetAll").addEventListener("click", resetAll);
+    $("backupBtn").addEventListener("click", backupFile);
+    $("restoreBtn").addEventListener("click", function () { $("restoreFile").click(); });
+    $("restoreFile").addEventListener("change", restoreFile);
     $("entries").addEventListener("click", function (e) {
       var del = e.target.closest("[data-del]"), open = e.target.closest("[data-open]");
       if (del) { deleteEntry(del.getAttribute("data-del")); }
@@ -3345,6 +3351,49 @@ window.COR_DEO_NOTES = {
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
     } catch (e) { flash(STR.copyFail); }
+  }
+
+  /** Full backup as a small JSON file (kept only on the visitor's own device). Restoring MERGES, it never deletes. */
+  function backupFile() {
+    try {
+      var data = { app: "cordeo", version: 1, saved: new Date().toISOString(), entries: state.entries, discovered: state.discovered };
+      var blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+      var url = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = url; a.download = "cor-deo-sicherung-" + todayStr() + ".json";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      flash(STR.backupDone);
+    } catch (e) { flash(STR.copyFail); }
+  }
+
+  function restoreFile() {
+    var input = $("restoreFile"), f = input.files && input.files[0];
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      var added = 0;
+      try {
+        var d = JSON.parse(String(rd.result));
+        if (!d || d.app !== "cordeo" || !Array.isArray(d.entries)) throw new Error("format");
+        var have = {};
+        state.entries.forEach(function (e) { have[e.id] = true; });
+        d.entries.forEach(function (e) {
+          if (!e || typeof e.id !== "string" || have[e.id]) return;
+          var card = +e.card;
+          if (!(card >= 1 && card <= cards.length) || typeof e.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(e.date)) return;
+          state.entries.push({ id: e.id, date: e.date, ts: +e.ts || Date.now(), card: card, note: String(e.note || "").slice(0, 5000) });
+          have[e.id] = true; added++;
+        });
+        if (d.discovered && typeof d.discovered === "object") {
+          Object.keys(d.discovered).forEach(function (k) { if (+k >= 1 && +k <= cards.length) state.discovered[k] = d.discovered[k]; });
+        }
+        saveState(); renderJourney();
+        flash(STR.restoreDone.replace("{n}", added));
+      } catch (e) { flash(STR.restoreBad); }
+      input.value = "";
+    };
+    rd.onerror = function () { flash(STR.restoreBad); input.value = ""; };
+    rd.readAsText(f);
   }
 
   /** Two-step reset (no pop-up dialogs: browsers block them inside embedded frames). */
