@@ -6,8 +6,8 @@
      sodass ein Update der Seite (VERSION erhöhen) die ~7,6 MB nicht erneut herunterlädt.
    - Fremde Adressen werden nicht angefasst (die Schriften liegen im Ordner fonts/ und werden wie Bilder aus dem Cache bedient).
    Bei Änderungen an diesem Skript: VERSION erhöhen. Bei neuen/geänderten Kartenbildern: IMG_CACHE erhöhen. */
-var VERSION = "cordeo-v21";
-var IMG_CACHE = "cordeo-img-v14";
+var VERSION = "cordeo-v22";
+var IMG_CACHE = "cordeo-img-v15";
 var CARD_COUNT = 120;                       // Anzahl der Bilddateien "COR DEO-Karten-001.jpg" … "-120.jpg"
 var PRECACHE_PARALLEL = 4;
 var SHELL = ["./", "index.html", "manifest.json", "pwa.js", "share.js", "legal.js", "card-text.js", "fonts/fonts.css", "share-qr.svg", "share-qr.png",
