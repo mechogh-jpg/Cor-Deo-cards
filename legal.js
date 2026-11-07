@@ -46,6 +46,8 @@
         "<p>Konzept, Gestaltung, Kartenbilder und Texte von COR DEO stammen von " + LEGAL.name + ". " +
         "Eine Verwendung außerhalb dieser Anwendung, insbesondere die Vervielfältigung oder Weitergabe der Karten, " +
         "ist nur mit vorheriger Zustimmung gestattet.</p>" +
+        "<h3>Hinweis zum Inhalt</h3>" +
+        "<p>Cor Deo ist ein Begleiter, kein Ersatz für Gottes Wort, Gebet und Gemeinde. Prüfe alles an der Heiligen Schrift.</p>" +
         "<h3>Bibeltext</h3>" +
         "<p>Bibelstellen auf den Karten: Schlachter 2000, © 2000 Genfer Bibelgesellschaft.</p>" +
         "<h3>Haftung für Links</h3>" +
