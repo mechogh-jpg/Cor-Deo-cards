@@ -48,6 +48,13 @@
         "ist nur mit vorheriger Zustimmung gestattet.</p>" +
         "<h3>Hinweis zum Inhalt</h3>" +
         "<p>Cor Deo ist ein Begleiter, kein Ersatz für Gottes Wort, Gebet und Gemeinde. Prüfe alles an der Heiligen Schrift.</p>" +
+        "<h3>Glaubensgrundlage</h3>" +
+        "<p>Cor Deo steht auf dem Boden der Heiligen Schrift und des Apostolischen und Nizänischen Glaubensbekenntnisses: " +
+        "Es gibt einen Gott in drei Personen, Vater, Sohn und Heiliger Geist. Jesus Christus ist wahrer Gott und wahrer Mensch, " +
+        "Gottes eingeborener Sohn. Er starb für unsere Sünden, wurde begraben und ist leiblich auferstanden. " +
+        "Er ist zum Vater aufgefahren und wird wiederkommen, um zu richten die Lebenden und die Toten. " +
+        "Wir werden allein aus Gnade durch den Glauben gerettet, nicht aus eigenen Werken (Epheser 2,8–9). " +
+        "Der Maßstab für alles ist die Bibel; die Grundlage der Evangelischen Allianz (Glaubensbasis) wird geteilt.</p>" +
         "<h3>Bibeltext</h3>" +
         "<p>Bibelstellen auf den Karten: Schlachter 2000, © 2000 Genfer Bibelgesellschaft.</p>" +
         "<h3>Haftung für Links</h3>" +
