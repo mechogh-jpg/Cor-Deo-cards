@@ -54,12 +54,55 @@
         "Gottes eingeborener Sohn. Er starb für unsere Sünden, wurde begraben und ist leiblich auferstanden. " +
         "Er ist zum Vater aufgefahren und wird wiederkommen, um zu richten die Lebenden und die Toten. " +
         "Wir werden allein aus Gnade durch den Glauben gerettet, nicht aus eigenen Werken (Epheser 2,8–9). " +
-        "Der Maßstab für alles ist die Bibel; die Grundlage der Evangelischen Allianz (Glaubensbasis) wird geteilt.</p>" +
+        "Der Maßstab für alles ist die Bibel; die Grundlage der Evangelischen Allianz (Glaubensbasis) wird geteilt. " +
+        "<a href=\"#glaube\">Mehr dazu unter „Glaube“.</a></p>" +
         "<h3>Bibeltext</h3>" +
         "<p>Bibelstellen auf den Karten: Schlachter 2000, © 2000 Genfer Bibelgesellschaft.</p>" +
         "<h3>Haftung für Links</h3>" +
         "<p>Diese Anwendung enthält keine bewusst gesetzten Links auf fremde Inhalte. Sollten Sie dennoch auf einen " +
         "problematischen Verweis stoßen, bitte ich um einen kurzen Hinweis per E-Mail.</p>"
+    },
+    glaube: {
+      title: "Glaube",
+      html:
+        "<p class=\"lg-lead\">Cor Deo steht auf dem Boden der Heiligen Schrift und des Glaubens der einen Kirche Jesu Christi. " +
+        "Prüfe alles an Gottes Wort.</p>" +
+
+        "<h3>Das Nizänische Glaubensbekenntnis</h3>" +
+        "<p class=\"lg-creed\">" +
+        "Wir glauben an den einen Gott,<br>den Vater, den Allmächtigen,<br>der alles geschaffen hat, Himmel und Erde,<br>die sichtbare und die unsichtbare Welt.</p>" +
+        "<p class=\"lg-creed\">" +
+        "Und an den einen Herrn Jesus Christus,<br>Gottes eingeborenen Sohn,<br>aus dem Vater geboren vor aller Zeit:<br>" +
+        "Gott von Gott, Licht vom Licht,<br>wahrer Gott vom wahren Gott,<br>gezeugt, nicht geschaffen,<br>eines Wesens mit dem Vater;<br>durch ihn ist alles geschaffen.</p>" +
+        "<p class=\"lg-creed\">" +
+        "Für uns Menschen und zu unserm Heil<br>ist er vom Himmel gekommen,<br>hat Fleisch angenommen durch den Heiligen Geist<br>von der Jungfrau Maria<br>und ist Mensch geworden.</p>" +
+        "<p class=\"lg-creed\">" +
+        "Er wurde für uns gekreuzigt unter Pontius Pilatus,<br>hat gelitten und ist begraben worden,<br>ist am dritten Tage auferstanden nach der Schrift<br>und aufgefahren in den Himmel.</p>" +
+        "<p class=\"lg-creed\">" +
+        "Er sitzt zur Rechten des Vaters<br>und wird wiederkommen in Herrlichkeit,<br>zu richten die Lebenden und die Toten;<br>seiner Herrschaft wird kein Ende sein.</p>" +
+        "<p class=\"lg-creed\">" +
+        "Wir glauben an den Heiligen Geist,<br>der Herr ist und lebendig macht,<br>der aus dem Vater [und dem Sohn] hervorgeht,<br>" +
+        "der mit dem Vater und dem Sohn<br>angebetet und verherrlicht wird,<br>der gesprochen hat durch die Propheten,<br>" +
+        "und die eine, heilige, allgemeine und apostolische Kirche.</p>" +
+        "<p class=\"lg-creed\">" +
+        "Wir bekennen die eine Taufe zur Vergebung der Sünden.<br>Wir erwarten die Auferstehung der Toten<br>und das Leben der kommenden Welt.<br>Amen.</p>" +
+        "<p class=\"lg-stand\">Glaubensbekenntnis von Nizäa-Konstantinopel (381), in der ökumenischen deutschen Fassung. " +
+        "Die Worte „und dem Sohn“ stehen in der ökumenischen Fassung in eckigen Klammern.</p>" +
+
+        "<h3>Die Glaubensbasis der Evangelischen Allianz</h3>" +
+        "<p>Cor Deo teilt die Glaubensbasis der Evangelischen Allianz. Sie bekennt in sieben Punkten (hier mit eigenen Worten zusammengefasst):</p>" +
+        "<ul class=\"lg-list\">" +
+        "<li><strong>Der dreieine Gott:</strong> Vater, Sohn und Heiliger Geist, Schöpfer, Erhalter und Vollender.</li>" +
+        "<li><strong>Der Mensch:</strong> Ebenbild Gottes, als Mann und Frau geschaffen, durch die Sünde von Gott getrennt.</li>" +
+        "<li><strong>Jesus Christus:</strong> wahrer Mensch und wahrer Gott, stellvertretend für alle Menschen gestorben und auferstanden, der einzige Weg zu Gott. " +
+        "Der Sünder wird allein aus Gnade durch den Glauben gerechtfertigt.</li>" +
+        "<li><strong>Der Heilige Geist:</strong> schenkt neues Leben, befähigt zum Gehorsam und gibt Gaben zum Dienst.</li>" +
+        "<li><strong>Die Gemeinde:</strong> Christus baut seine weltweite Gemeinde und sendet sie, das Evangelium zu bezeugen und in Liebe und Gerechtigkeit zu handeln.</li>" +
+        "<li><strong>Die Wiederkunft:</strong> Christus kommt sichtbar wieder, richtet die Lebenden und die Toten und vollendet Gottes Reich.</li>" +
+        "<li><strong>Die Bibel:</strong> Altes und Neues Testament sind Gottes Offenbarung und höchste Autorität in allen Fragen des Glaubens und der Lebensführung.</li>" +
+        "</ul>" +
+        "<p>Den vollständigen und aktuellen Wortlaut findest du bei der " +
+        "<a href=\"https://www.ead.de/ueber-uns/auftrag/\" target=\"_blank\" rel=\"noopener noreferrer\">Evangelischen Allianz in Deutschland</a>.</p>"
     },
     datenschutz: {
       title: "Datenschutzerklärung",
@@ -140,6 +183,8 @@
     ".lg-body p{margin:.3rem 0;color:var(--text)}" +
     ".lg-body a{color:var(--gold);text-underline-offset:.2em;word-break:break-word}" +
     ".lg-lead{font-family:var(--font-display);font-style:italic;font-size:1.12rem;line-height:1.5;color:var(--text-muted)!important;margin:.5rem 0 .2rem!important}" +
+    ".lg-creed{margin:.7rem 0!important;font-family:var(--font-display);font-size:1.02rem;line-height:1.55}" +
+    ".lg-list{margin:.4rem 0 .6rem;padding-left:1.1rem}.lg-list li{margin:.45rem 0}" +
     ".lg-stand{margin-top:1.4rem!important;font-size:.78rem;color:var(--text-muted)!important}";
   document.head.appendChild(css);
 
@@ -149,7 +194,9 @@
   links.innerHTML =
     '<button type="button" data-legal="impressum">Impressum</button>' +
     '<span class="lg-dot" aria-hidden="true"> · </span>' +
-    '<button type="button" data-legal="datenschutz">Datenschutz</button>';
+    '<button type="button" data-legal="datenschutz">Datenschutz</button>' +
+    '<span class="lg-dot" aria-hidden="true"> · </span>' +
+    '<button type="button" data-legal="glaube">Glaube</button>';
   footer.appendChild(links);
 
   /* ---------- Fenster ---------- */
@@ -161,6 +208,7 @@
       '<div class="lg-tabs" role="tablist" aria-label="Rechtliche Hinweise">' +
         '<button type="button" class="lg-tab" role="tab" data-legal="impressum">Impressum</button>' +
         '<button type="button" class="lg-tab" role="tab" data-legal="datenschutz">Datenschutz</button>' +
+        '<button type="button" class="lg-tab" role="tab" data-legal="glaube">Glaube</button>' +
       "</div>" +
       '<button type="button" class="lg-x" aria-label="Schließen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
     "</div>" +
@@ -193,7 +241,7 @@
   }
 
   dlg.addEventListener("close", function () {
-    if (location.hash === "#impressum" || location.hash === "#datenschutz") {
+    if (location.hash === "#impressum" || location.hash === "#datenschutz" || location.hash === "#glaube") {
       if (history.replaceState) { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
     }
     if (opener && opener.focus) { try { opener.focus(); } catch (e) {} }
@@ -202,6 +250,8 @@
     if (e.target === dlg) { close(); return; }                       // Klick auf den Hintergrund
     var x = e.target.closest(".lg-x"); if (x) { close(); return; }
     var t = e.target.closest(".lg-tab"); if (t) show(t.getAttribute("data-legal"));
+    var a = e.target.closest("a[href^='#']");
+    if (a) { var k = a.getAttribute("href").slice(1); if (TEXT[k]) { e.preventDefault(); show(k); if (history.replaceState) { try { history.replaceState(null, "", "#" + k); } catch (err) {} } } }
   });
   links.addEventListener("click", function (e) {
     var b = e.target.closest("button[data-legal]");
